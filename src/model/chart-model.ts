@@ -17,6 +17,10 @@ import { GridOptions } from './grid';
 import { InvalidateMask, InvalidationLevel } from './invalidate-mask';
 import { IPriceDataSource } from './iprice-data-source';
 import { ColorType, LayoutOptions, LayoutOptionsInternal } from './layout-options';
+import { LineTool, LineToolPoint } from './line-tool';
+import { LineToolOptionsMap, LineToolType } from './line-tool-options';
+import { LineTools } from './line-tools';
+import { LineToolCreator } from './line-tool-creator';
 import { LocalizationOptions } from './localization-options';
 import { Magnet } from './magnet';
 import { DEFAULT_STRETCH_FACTOR, Pane } from './pane';
@@ -330,6 +334,7 @@ export class ChartModel implements IDestroyable {
 
 	private readonly _timeScale: TimeScale;
 	private readonly _panes: Pane[] = [];
+	private readonly _lineToolCreator: LineToolCreator;
 	private readonly _crosshair: Crosshair;
 	private readonly _magnet: Magnet;
 	private readonly _watermark: Watermark;
@@ -356,6 +361,7 @@ export class ChartModel implements IDestroyable {
 		this._crosshair = new Crosshair(this, options.crosshair);
 		this._magnet = new Magnet(options.crosshair);
 		this._watermark = new Watermark(this, options.watermark);
+		this._lineToolCreator = new LineToolCreator(this);
 
 		this.createPane();
 		this._panes[0].setStretchFactor(DEFAULT_STRETCH_FACTOR * 2);
@@ -383,6 +389,16 @@ export class ChartModel implements IDestroyable {
 
 	public hoveredSource(): HoveredSource | null {
 		return this._hoveredSource;
+	}
+
+	public dataSources(): IPriceDataSource[] {
+		const sources: IPriceDataSource[] = [];
+		for (const pane of this._panes) {
+			for (const paneSource of pane.dataSources()) {
+				sources.push(paneSource);
+			}
+		}
+		return sources;
 	}
 
 	public setHoveredSource(source: HoveredSource | null): void {
@@ -475,8 +491,16 @@ export class ChartModel implements IDestroyable {
 		return this._watermark;
 	}
 
+	public lineToolCreator(): LineToolCreator {
+		return this._lineToolCreator;
+	}
+
 	public crosshairSource(): Crosshair {
 		return this._crosshair;
+	}
+
+	public magnet(): Magnet {
+		return this._magnet;
 	}
 
 	public crosshairMoved(): ISubscription<TimePointIndex | null, Point | null> {
@@ -653,7 +677,7 @@ export class ChartModel implements IDestroyable {
 		this._crosshair.setPosition(index, price, pane);
 
 		this.cursorUpdate();
-		this._crosshairMoved.fire(this._crosshair.appliedIndex(), { x, y });
+		this._crosshairMoved.fire(this._crosshair.appliedIndex(), new Point(x, y));
 	}
 
 	public clearCurrentPosition(): void {
@@ -770,6 +794,13 @@ export class ChartModel implements IDestroyable {
 		if (series.destroy) {
 			series.destroy();
 		}
+	}
+
+	public createLineTool<T extends LineToolType>(lineToolType: T, options: LineToolOptionsMap[T], points: LineToolPoint[]): LineTool<T> {
+		const lineTool = new LineTools[lineToolType](this, options, points) as LineTool<T>;
+		// TODO: iosif add to ownerSourceId pane
+		this._panes[0].addDataSource(lineTool as unknown as IPriceDataSource, this.defaultVisiblePriceScaleId());
+		return lineTool;
 	}
 
 	public moveSeriesToScale(series: Series, targetScaleId: string): void {

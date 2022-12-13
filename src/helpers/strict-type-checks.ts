@@ -1,3 +1,13 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/ban-types */
+
+type OmitDistributive<T, K extends PropertyKey> = T extends any ? (T extends object ? Id<OmitRecursively<T, K>> : T) : never;
+type Id<T> = {} & { [P in keyof T]: T[P] };
+export type OmitRecursively<T extends any, K extends PropertyKey> = Omit<
+    { [P in keyof T]: OmitDistributive<T[P], K> },
+    K
+>;
+
 /**
  * Represents a type `T` where every property is optional.
  */

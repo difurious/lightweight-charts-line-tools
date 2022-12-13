@@ -53,6 +53,21 @@ function fillSizeAndY(
 	rendererItem.size = shapeSize;
 
 	switch (marker.position) {
+		case 'price': {
+			const markerPrice = marker.price || inBarPrice;
+			const anchor = marker.anchor || 'center';
+
+			const displaceY = anchor === 'top' ? 1 : anchor === 'bottom' ? -1 : 0;
+			const displaceX = anchor === 'left' ? 1 : anchor === 'right' ? -1 : 0;
+
+			rendererItem.y = (priceScale.priceToCoordinate(markerPrice, firstValue) + halfSize * displaceY) as Coordinate;
+			rendererItem.x = (rendererItem.x + halfSize * displaceX) as Coordinate;
+			if (rendererItem.text !== undefined) {
+				rendererItem.text.y = (rendererItem.y + (halfSize + shapeMargin + textHeight * (0.5 + Constants.TextMargin)) * displaceY ||
+					1) as Coordinate;
+			}
+			return;
+		}
 		case 'inBar': {
 			rendererItem.y = priceScale.priceToCoordinate(inBarPrice, firstValue);
 			if (rendererItem.text !== undefined) {

@@ -6,8 +6,11 @@ export { TrackingModeExitMode } from './model/chart-model';
 export { CrosshairMode } from './model/crosshair';
 export { PriceScaleMode } from './model/price-scale';
 export { PriceLineSource, LastPriceAnimationMode, LasPriceAnimationMode } from './model/series-options';
+export { BoxHorizontalAlignment, BoxVerticalAlignment } from './model/line-tool-options';
 export { TickMarkType } from './model/time-scale';
 export { ColorType } from './model/layout-options';
+export { LineEnd } from './renderers/draw-line';
+export { TextAlignment } from './model/line-tool-options';
 
 export {
 	isBusinessDay,

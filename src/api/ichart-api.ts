@@ -2,6 +2,8 @@ import { DeepPartial } from '../helpers/strict-type-checks';
 
 import { BarPrice, BarPrices } from '../model/bar';
 import { ChartOptions } from '../model/chart-model';
+import { LineToolPoint } from '../model/line-tool';
+import { LineToolPartialOptionsMap, LineToolType } from '../model/line-tool-options';
 import { Point } from '../model/point';
 import { SeriesMarker } from '../model/series-markers';
 import {
@@ -16,6 +18,7 @@ import {
 import { BusinessDay, UTCTimestamp } from '../model/time-data';
 
 import { Time } from './data-consumer';
+import { ILineToolApi } from './iline-tool-api';
 import { IPriceScaleApi } from './iprice-scale-api';
 import { ISeriesApi } from './iseries-api';
 import { ITimeScaleApi } from './itime-scale-api';
@@ -147,6 +150,16 @@ export interface IChartApi {
 	 * ```
 	 */
 	addLineSeries(lineOptions?: LineSeriesPartialOptions): ISeriesApi<'Line'>;
+
+	/**
+	 * Creates a line tool with specified parameters.
+	 */
+	addLineTool<T extends LineToolType>(name: T, points: LineToolPoint[], options: LineToolPartialOptionsMap[T]): ILineToolApi<T>;
+
+	/**
+	 * Sets the active line tool with specified parameters.
+	 */
+	setActiveLineTool<T extends LineToolType>(name: T, options: LineToolPartialOptionsMap[T]): void;
 
 	/**
 	 * Removes a series of any type. This is an irreversible operation, you cannot do anything with the series after removing it.

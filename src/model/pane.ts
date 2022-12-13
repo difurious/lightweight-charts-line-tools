@@ -23,6 +23,18 @@ interface MinMaxOrderInfo {
 	maxZOrder: number;
 }
 
+export enum PaneCursorType {
+	Default = 'default',
+	Crosshair = 'crosshair',
+	Pointer = 'pointer',
+	Grabbing = 'grabbing',
+	ZoomIn = 'zoom-in',
+	VerticalResize = 'n-resize',
+	HorizontalResize = 'e-resize',
+	DiagonalNeSwResize = 'nesw-resize',
+	DiagonalNwSeResize = 'nwse-resize',
+}
+
 export class Pane implements IDestroyable {
 	private readonly _timeScale: TimeScale;
 	private readonly _model: ChartModel;

@@ -19,4 +19,5 @@ export const crosshairOptionsDefaults: CrosshairOptions = {
 		labelBackgroundColor: '#4c525e',
 	},
 	mode: CrosshairMode.Magnet,
+	magnetThreshold: 14,
 };

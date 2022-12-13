@@ -277,7 +277,7 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 			this._drawTickMarks(ctx, this._canvasBinding.pixelRatio);
 			// atm we don't have sources to be drawn on time axis except crosshair which is rendered on top level canvas
 			// so let's don't call this code at all for now
-			// this._drawLabels(this._chart.model().dataSources(), ctx, pixelRatio);
+			this._drawLabels(this._chart.model().dataSources(), ctx, this._canvasBinding.pixelRatio);
 
 			if (this._leftStub !== null) {
 				this._leftStub.paint(type);
@@ -400,8 +400,9 @@ export class TimeAxisWidget implements MouseEventHandlers, IDestroyable {
 		const rendererOptions = this._getRendererOptions();
 		for (const source of sources) {
 			for (const view of source.timeAxisViews()) {
+				const renderer = view.renderer();
 				ctx.save();
-				view.renderer().draw(ctx, rendererOptions, pixelRatio);
+				renderer.draw(ctx, rendererOptions, pixelRatio);
 				ctx.restore();
 			}
 		}

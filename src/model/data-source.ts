@@ -1,3 +1,5 @@
+import { randomHashN } from '../helpers/uid';
+
 import { IPaneView } from '../views/pane/ipane-view';
 import { IPriceAxisView } from '../views/price-axis/iprice-axis-view';
 import { ITimeAxisView } from '../views/time-axis/itime-axis-view';
@@ -8,9 +10,18 @@ import { PriceScale } from './price-scale';
 
 export abstract class DataSource implements IDataSource {
 	protected _priceScale: PriceScale | null = null;
+	private _id: string = randomHashN(6);
 
 	private _zorder: number = 0;
 
+	public id(): string {
+		return this._id;
+	}
+
+	public setId(id: string): void {
+		this._id = id;
+	}
+	
 	public zorder(): number {
 		return this._zorder;
 	}

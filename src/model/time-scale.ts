@@ -283,6 +283,27 @@ export class TimeScale {
 		return this._points[index]?.time || null;
 	}
 
+	public floatIndexToTime(index: TimePointIndex): TimePoint | null {
+		const index1 = Math.floor(index);
+		const index2 = Math.ceil(index);
+
+		const time1 = this._points[index1]?.time.timestamp as number;
+		const time2 = this._points[index2]?.time.timestamp as number;
+		const firstTime = this._points[0]?.time.timestamp as number;
+		const lastTime = this._points[this._points.length - 1]?.time.timestamp as number;
+		const interval = this._points[1].time.timestamp - this._points[0].time.timestamp;
+
+		if (index >= this._points.length - 1) {
+			return { timestamp: (lastTime + interval * (index - this._points.length + 1 )) as UTCTimestamp };
+		} else if (index < 0) {
+			return { timestamp: (firstTime - interval * -index) as UTCTimestamp };
+		} else if (time1 && time2) {
+			return { timestamp: (time1 + (time2 - time1) * (index - index1)) as UTCTimestamp };
+		} else {
+			return null;
+		}
+	}
+
 	public timeToIndex(time: TimePoint, findNearest: boolean): TimePointIndex | null {
 		if (this._points.length < 1) {
 			// no time points available
@@ -421,8 +442,40 @@ export class TimeScale {
 		}
 	}
 
+	public timeToCoordinate(timePoint: TimePoint): Coordinate {
+		const index = this.timeToIndex(timePoint, true);
+		const timestamp = this._points[index as number].time.timestamp;
+		const x = this.indexToCoordinate(index as TimePointIndex);
+		if (timestamp === timePoint.timestamp) {
+			return x;
+		} else if (index === 0 || index === this._points.length - 1) {
+			const interval = this._points[1].time.timestamp - this._points[0].time.timestamp;
+			const timeDiff = timePoint.timestamp - timestamp;
+			const bars = timeDiff / interval;
+			return x + (bars * this.barSpacing()) as Coordinate;
+		} else {
+			return x;
+		}
+		
+	}
+
 	public coordinateToIndex(x: Coordinate): TimePointIndex {
 		return Math.ceil(this._coordinateToFloatIndex(x)) as TimePointIndex;
+	}
+
+	public coordinateToTime(x: Coordinate): TimePoint {
+		const interval = this._points[1].time.timestamp - this._points[0].time.timestamp;
+		const index = this.coordinateToIndex(x);
+
+		if (index >= this._points.length) {
+			const extraTime = interval * (index - this._points.length + 1);
+			return { timestamp: this._points[this._points.length - 1].time.timestamp + extraTime as UTCTimestamp };
+		} else if (index < 0) {
+			const extraTime = interval * -index;
+			return { timestamp: this._points[0].time.timestamp - extraTime as UTCTimestamp };
+		}
+
+		return this._points[index].time;
 	}
 
 	public setRightOffset(offset: number): void {

@@ -205,10 +205,10 @@ export class SeriesLastPriceAnimationPaneView implements IUpdatablePaneView {
 			return;
 		}
 
-		const lastValuePoint: Point = {
-			x: timeScale.indexToCoordinate(lastValue.index),
-			y: this._series.priceScale().priceToCoordinate(lastValue.price, firstValue.value),
-		};
+		const lastValuePoint: Point = new Point(
+			timeScale.indexToCoordinate(lastValue.index),
+			this._series.priceScale().priceToCoordinate(lastValue.price, firstValue.value)
+		);
 
 		const seriesLineColor = lastValue.color;
 		const seriesLineWidth = this._series.options().lineWidth;

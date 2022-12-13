@@ -106,6 +106,10 @@ export interface CrosshairOptions {
 	 * @defaultValue {@link CrosshairMode.Magnet}
 	 */
 	mode: CrosshairMode;
+	/**
+	 * The threashold of the magnet
+	 */
+	magnetThreshold: number;
 
 	/**
 	 * Vertical line options.

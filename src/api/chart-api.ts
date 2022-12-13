@@ -8,6 +8,8 @@ import { clone, DeepPartial, isBoolean, merge } from '../helpers/strict-type-che
 import { BarPrice, BarPrices } from '../model/bar';
 import { ChartOptions, ChartOptionsInternal } from '../model/chart-model';
 import { ColorType } from '../model/layout-options';
+import { LineToolPoint } from '../model/line-tool';
+import { LineToolOptionsMap, LineToolPartialOptionsMap, LineToolType } from '../model/line-tool-options';
 import { Series } from '../model/series';
 import {
 	AreaSeriesOptions,
@@ -33,10 +35,13 @@ import { CandlestickSeriesApi } from './candlestick-series-api';
 import { DataUpdatesConsumer, SeriesDataItemTypeMap } from './data-consumer';
 import { DataLayer, DataUpdateResponse, SeriesChanges } from './data-layer';
 import { IChartApi, MouseEventHandler, MouseEventParams } from './ichart-api';
+import { ILineToolApi } from './iline-tool-api';
 import { IPriceScaleApi } from './iprice-scale-api';
 import { ISeriesApi } from './iseries-api';
 import { ITimeScaleApi } from './itime-scale-api';
+import { LineToolApi } from './line-tool-api';
 import { chartOptionsDefaults } from './options/chart-options-defaults';
+import { LineToolsOptionDefaults } from './options/line-tools-options-defaults';
 import {
 	areaStyleDefaults,
 	barStyleDefaults,
@@ -306,6 +311,16 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 
 		this._seriesMap.delete(seriesApi);
 		this._seriesMapReversed.delete(series);
+	}
+
+	public addLineTool<T extends LineToolType>(name: T, points: LineToolPoint[], options?: LineToolPartialOptionsMap[T]): ILineToolApi<T> {
+		const strictOptions = merge(clone(LineToolsOptionDefaults[name]), options || {}) as LineToolOptionsMap[T];
+		const tool = this._chartWidget.model().createLineTool(name, strictOptions, points);
+		return new LineToolApi<T>(tool);
+	}
+
+	public setActiveLineTool<T extends LineToolType>(name: T, options?: LineToolPartialOptionsMap[T]): void {
+		this._chartWidget.model().lineToolCreator().setActiveLineTool(name, options);
 	}
 
 	public applyNewData<TSeriesType extends SeriesType>(series: Series<TSeriesType>, data: SeriesDataItemTypeMap[TSeriesType][]): void {

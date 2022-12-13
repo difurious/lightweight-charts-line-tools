@@ -17,3 +17,12 @@ export function optimalCandlestickWidth(barSpacing: number, pixelRatio: number):
 	const optimal = Math.min(res, scaledBarSpacing);
 	return Math.max(Math.floor(pixelRatio), optimal);
 }
+
+export const interactionTolerance = {
+	line: 3,
+	minDistanceBetweenPoints: 5,
+	series: 2,
+	curve: 3,
+	anchor: 2,
+	esd: 0,
+};
