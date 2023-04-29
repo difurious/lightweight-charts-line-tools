@@ -271,6 +271,14 @@ export abstract class LineToolPaneView implements IUpdatablePaneView, IInputEven
 					appliedPoint.y = this._points[0].y;
 				} else if (this._editedPointIndex === 0) {
 					appliedPoint.y = this._points[1].y;
+				} else if (this._editedPointIndex === 2) {
+					// parallelChannel is the only tool supporting holding shift that has 3-4 points
+					// points does not track point 3, so i have to use the diference from 0 and 1 and offset 2 so it now match what point 3 is without knowing anything about 3
+					const dif = this._points[0].y - this._points[1].y;
+					appliedPoint.y = (this._points[2].y - dif) as Coordinate;
+				} else if (this._editedPointIndex === 3) {
+					// parallelChannel is the only tool supporting holding shift that has 3-4 points
+					appliedPoint.y = this._points[2].y;
 				}
 			} else {
 				// if shift, isTrendLine = true and at least 1 point exists already
@@ -285,7 +293,7 @@ export abstract class LineToolPaneView implements IUpdatablePaneView, IInputEven
 	protected _isTrendLine(): boolean {
 		let isTrendLine = false;
 		const toolTypeStr = String(this._source.toolType());
-		if (toolTypeStr === 'TrendLine' || toolTypeStr === 'Ray' || toolTypeStr === 'Arrow' || toolTypeStr === 'ExtendedLine') {
+		if (toolTypeStr === 'TrendLine' || toolTypeStr === 'Ray' || toolTypeStr === 'Arrow' || toolTypeStr === 'ExtendedLine' || toolTypeStr === 'ParallelChannel') {
 			isTrendLine = true;
 		}
 		return isTrendLine;
