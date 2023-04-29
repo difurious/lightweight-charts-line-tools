@@ -6,25 +6,23 @@ import { DeepPartial, merge } from '../helpers/strict-type-checks';
 
 import { IPaneView } from '../views/pane/ipane-view';
 import { IUpdatablePaneView } from '../views/pane/iupdatable-pane-view';
-import { PriceAxisView } from '../views/price-axis/price-axis-view';
 import { LineToolPriceAxisBackgroundView } from '../views/price-axis/line-tool-price-axis-background-view';
 import { LineToolPriceAxisLabelView } from '../views/price-axis/line-tool-price-axis-label-view';
+import { PriceAxisView } from '../views/price-axis/price-axis-view';
 import { ITimeAxisView } from '../views/time-axis/itime-axis-view';
 import { LineToolTimeAxisBackgroundView } from '../views/time-axis/line-tool-time-axis-background-view';
 import { LineToolTimeAxisLabelView } from '../views/time-axis/line-tool-time-axis-label-view';
 
 import { AutoscaleInfoImpl } from './autoscale-info-impl';
 import { ChartModel } from './chart-model';
-//import { DataSource } from './data-source';
-import { PriceDataSource } from './price-data-source';
 import { FirstValue, IPriceDataSource } from './iprice-data-source';
 import { LineToolOptionsCommon, LineToolOptionsMap, LineToolPartialOptionsMap, LineToolType } from './line-tool-options';
 import { Pane, PaneCursorType } from './pane';
 import { Point } from './point';
+import { PriceDataSource } from './price-data-source';
 import { PriceScale } from './price-scale';
-import { UTCTimestamp } from './time-data';
+import { TimePointIndex, UTCTimestamp } from './time-data';
 import { TimeScale } from './time-scale';
-import { TimePointIndex } from './time-data';
 
 export interface LineToolPoint {
 	price: number;
@@ -42,18 +40,23 @@ export interface LineToolHitTestData {
 	cursorType: PaneCursorType;
 }
 
+export interface LineToolExport<T extends LineToolType> {
+	id: string;
+	toolType: LineToolType;
+	options: LineToolOptionsInternal<T>;
+	points: LineToolPoint[];
+}
+
 export type LineToolOptionsInternal<T extends LineToolType> = LineToolOptionsMap[T];
 export type LineToolPartialOptionsInternal<T extends LineToolType> = LineToolPartialOptionsMap[T];
 
-//export abstract class LineTool<T extends LineToolType = LineToolType> extends DataSource implements IDestroyable {
+// export abstract class LineTool<T extends LineToolType = LineToolType> extends DataSource implements IDestroyable {
 export abstract class LineTool<T extends LineToolType = LineToolType> extends PriceDataSource implements IDestroyable {
 	protected _pointChanged: Delegate = new Delegate();
 	protected _pointAdded: Delegate = new Delegate();
 	protected _priceAxisViews: PriceAxisView[] = [];
 	protected _timeAxisViews: ITimeAxisView[] = [];
 	protected _paneViews: IUpdatablePaneView[] = [];
-	
-	private _formatter!: IPriceFormatter;
 
 	protected readonly _options: LineToolOptionsInternal<T>;
 	protected readonly _toolType!: LineToolType;
@@ -62,15 +65,18 @@ export abstract class LineTool<T extends LineToolType = LineToolType> extends Pr
 	protected _selected: boolean = false;
 	protected _finished: boolean = false;
 	protected _editing: boolean = false;
+	protected _creating: boolean = false;
 
 	protected _ownerSource: IPriceDataSource | null = null;
 	protected _lastPoint: LineToolPoint | null = null;
 	protected _points: LineToolPoint[] = [];
-	//protected _model: ChartModel;
+	// protected _model: ChartModel;
+
+	private _formatter!: IPriceFormatter;
 
 	public constructor(model: ChartModel, options: LineToolOptionsInternal<T>, points: LineToolPoint[] = []) {
 		super(model);
-		//this._model = model;
+		// this._model = model;
 		this._points = points;
 		this._options = options;
 
@@ -88,6 +94,9 @@ export abstract class LineTool<T extends LineToolType = LineToolType> extends Pr
 		// this._ownerSource = model.serieses().find((series: IPriceDataSource) => series.id() === this._options.ownerSourceId) || null;
 		this._ownerSource = model.serieses()[0];
 		this._finished = this._points.length >= (this.pointsCount() === -1 ? 2 : this.pointsCount());
+		// if no point is provided, we consider that linetool is being created and the call to tryFinish will set it to false afterwards.
+		// if points are provided, just get the inverse of _finished value.
+		this._creating = this._points.length === 0 ? true : !this.finished();
 	}
 
 	public abstract pointsCount(): number;
@@ -100,6 +109,7 @@ export abstract class LineTool<T extends LineToolType = LineToolType> extends Pr
 		if (this._points.length >= Math.max(1, this.pointsCount())) {
 			this._finished = true;
 			this._selected = true;
+			this._creating = false;
 			this._lastPoint = null;
 			this.model().updateSource(this);
 		}
@@ -245,6 +255,16 @@ export abstract class LineTool<T extends LineToolType = LineToolType> extends Pr
 		return changed;
 	}
 
+	public creating(): boolean {
+		return this._creating;
+	}
+
+	public setCreating(creating: boolean): boolean {
+		const changed = creating !== this._creating;
+		this._creating = creating;
+		return changed;
+	}
+
 	// public model(): ChartModel {
 		// return this._model;
 	// }
@@ -286,28 +306,31 @@ export abstract class LineTool<T extends LineToolType = LineToolType> extends Pr
 	public hasMagnet(): boolean {
 		return true;
 	}
-	
+
 	// implementation of IPriceDataSource
-	
 	public minMove(): number {
 		return 0;
-		// return this._options.priceFormat.minMove; // Shinobaki : TODO
+		// return this._options.priceFormat.minMove;
 	}
 
 	public autoscaleInfo(startTimePoint: TimePointIndex, endTimePoint: TimePointIndex): AutoscaleInfoImpl | null {
 		return null;
 	}
 
-	public firstValue(): FirstValue | null  {
+	public firstValue(): FirstValue | null {
 		return null;
 	}
-	
+
 	public formatter(): IPriceFormatter {
 		return this._formatter;
 	}
-	
+
 	public priceLineColor(lastBarColor: string): string {
 		return lastBarColor;
+	}
+
+	public exportLineToolToLineToolExport(): LineToolExport<T> {
+		return { id: this.id(), toolType: this._toolType, options: this.options(), points: this.points() };
 	}
 
 	protected _setPaneViews(paneViews: IUpdatablePaneView[]): void {

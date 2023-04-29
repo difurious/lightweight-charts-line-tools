@@ -64,10 +64,10 @@ export class RectanglePaneView extends LineToolPaneView {
 						hoirzontalPadding = textHalfSize;
 						break;
 					case BoxVerticalAlignment.Top:
-						pivot.y = maxY as Coordinate;
+						pivot.y = minY as Coordinate;
 						break;
 					case BoxVerticalAlignment.Bottom:
-						pivot.y = minY as Coordinate;
+						pivot.y = maxY as Coordinate;
 				}
 
 				switch (options.text.box.alignment.horizontal) {
@@ -85,7 +85,9 @@ export class RectanglePaneView extends LineToolPaneView {
 				labelOptions.box = { ...labelOptions.box, padding: { y: textHalfSize, x: hoirzontalPadding } };
 
 				if (options.text.box.alignment.vertical === BoxVerticalAlignment.Middle) {
-					labelOptions.wordWrapWidth = maxX - minX - 2 * hoirzontalPadding;
+					// if (options.text.forceCalculateMaxLineWidth) {
+					//	labelOptions.wordWrapWidth = maxX - minX - 2 * hoirzontalPadding;
+					// }
 					labelOptions.box.maxHeight = maxY - minY;
 				}
 

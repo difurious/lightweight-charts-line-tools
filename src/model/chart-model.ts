@@ -12,15 +12,16 @@ import { PriceAxisRendererOptionsProvider } from '../renderers/price-axis-render
 
 import { Coordinate } from './coordinate';
 import { Crosshair, CrosshairOptions } from './crosshair';
+import { CustomPriceLine } from './custom-price-line';
 import { DefaultPriceScaleId, isDefaultPriceScale } from './default-price-scale';
 import { GridOptions } from './grid';
 import { InvalidateMask, InvalidationLevel } from './invalidate-mask';
 import { IPriceDataSource } from './iprice-data-source';
 import { ColorType, LayoutOptions, LayoutOptionsInternal } from './layout-options';
-import { LineTool, LineToolPoint } from './line-tool';
+import { LineTool, LineToolExport, LineToolPoint } from './line-tool';
+import { LineToolCreator } from './line-tool-creator';
 import { LineToolOptionsMap, LineToolType } from './line-tool-options';
 import { LineTools } from './line-tools';
-import { LineToolCreator } from './line-tool-creator';
 import { LocalizationOptions } from './localization-options';
 import { Magnet } from './magnet';
 import { DEFAULT_STRETCH_FACTOR, Pane } from './pane';
@@ -346,6 +347,8 @@ export class ChartModel implements IDestroyable {
 	private _hoveredSource: HoveredSource | null = null;
 	private readonly _priceScalesOptionsChanged: Delegate = new Delegate();
 	private _crosshairMoved: Delegate<TimePointIndex | null, Point | null> = new Delegate();
+	private _customPriceLineDragged: Delegate<CustomPriceLine, string> = new Delegate();
+	private _lineToolsDoubleClick: Delegate<LineToolExport<LineToolType>> = new Delegate();
 
 	private _backgroundTopColor: string;
 	private _backgroundBottomColor: string;
@@ -483,6 +486,10 @@ export class ChartModel implements IDestroyable {
 		return this._timeScale;
 	}
 
+	public getActivePane(): Pane | null {
+		return this._panes.length > 0 ? this._panes[0] : null;
+	}
+
 	public panes(): readonly Pane[] {
 		return this._panes;
 	}
@@ -505,6 +512,14 @@ export class ChartModel implements IDestroyable {
 
 	public crosshairMoved(): ISubscription<TimePointIndex | null, Point | null> {
 		return this._crosshairMoved;
+	}
+
+	public customPriceLineDragged(): ISubscription<CustomPriceLine, string> {
+		return this._customPriceLineDragged;
+	}
+
+	public lineToolsDoubleClick(): ISubscription<LineToolExport<LineToolType>> {
+		return this._lineToolsDoubleClick;
 	}
 
 	public setPaneHeight(pane: Pane, height: number): void {
@@ -745,6 +760,14 @@ export class ChartModel implements IDestroyable {
 		this._watermark.updateAllViews();
 		this._panes.forEach((p: Pane) => p.recalculate());
 		this.updateCrosshair();
+	}
+
+	public fireCustomPriceLineDragged(customPriceLine: CustomPriceLine, fromPriceString: string): void {
+		this._customPriceLineDragged.fire(customPriceLine, fromPriceString);
+	}
+
+	public fireLineToolsDoubleClick(selectedLineTools: LineToolExport<LineToolType>): void {
+		this._lineToolsDoubleClick.fire(selectedLineTools);
 	}
 
 	public destroy(): void {

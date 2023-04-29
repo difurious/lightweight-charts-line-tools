@@ -85,12 +85,34 @@ export const enum LineStyle {
 
 export function computeDashPattern(ctx: CanvasRenderingContext2D): number[] {
 	return [
-		[ctx.lineWidth, 2 * ctx.lineWidth],
-		[5 * ctx.lineWidth, 6 * ctx.lineWidth],
+		[ctx.lineWidth, ctx.lineWidth],
+		[2 * ctx.lineWidth, 2 * ctx.lineWidth],
 		[6 * ctx.lineWidth, 6 * ctx.lineWidth],
 		[ctx.lineWidth, 4 * ctx.lineWidth],
 		[2 * ctx.lineWidth, ctx.lineWidth],
 	][ctx.lineStyle - 1] || [];
+}
+
+export function computeEndLineSize(lineWidth: number): number {
+	let endLineMultiplier = 1;
+	switch (lineWidth) {
+		case 1:
+			endLineMultiplier = 3.5;
+			break;
+		case 2:
+			endLineMultiplier = 2;
+			break;
+		case 3:
+			endLineMultiplier = 1.5;
+			break;
+		case 4:
+			endLineMultiplier = 1.25;
+			break;
+		case 0:
+		default:
+			break;
+	}
+	return endLineMultiplier;
 }
 
 export function setLineStyle(ctx: CanvasRenderingContext2D, style: LineStyle): void {
@@ -191,10 +213,11 @@ export function extendAndClipLineSegment(point0: Point, point1: Point, width: nu
 }
 
 export function drawCircleEnd(point: Point, ctx: CanvasRenderingContext2D, width: number, pixelRatio: number): void {
+	const circleEndMultiplier = computeEndLineSize(width);
 	ctx.save();
 	ctx.fillStyle = '#000000';
 	ctx.beginPath();
-	ctx.arc(point.x * pixelRatio, point.y * pixelRatio, width * pixelRatio, 0, 2 * Math.PI, false);
+	ctx.arc(point.x * pixelRatio, point.y * pixelRatio, width * circleEndMultiplier * pixelRatio, 0, 2 * Math.PI, false);
 	ctx.fill();
 	ctx.restore();
 }
@@ -214,7 +237,8 @@ export function getArrowPoints(point0: Point, point1: Point, width: number): [[P
 	const n = Math.sqrt(2);
 	const o = point1.subtract(point0);
 	const a = o.normalized();
-	const l = 5 * width;
+	const arrowheadMultiplier = computeEndLineSize(width);
+	const l = 5 * width * arrowheadMultiplier;
 	const c = 1 * r;
 
 	if (l * n * 0.2 <= c) { return []; }

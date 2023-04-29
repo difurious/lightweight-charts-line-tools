@@ -8,6 +8,8 @@ import { ChartModel, ChartOptions, OverlayPriceScaleOptions, VisiblePriceScaleOp
 import { DefaultPriceScaleId, isDefaultPriceScale } from './default-price-scale';
 import { Grid } from './grid';
 import { IPriceDataSource } from './iprice-data-source';
+import { LineTool } from './line-tool';
+import { LineToolType } from './line-tool-options';
 import { PriceScale, PriceScaleOptions, PriceScaleState } from './price-scale';
 import { sortSources } from './sort-sources';
 import { TimeScale } from './time-scale';
@@ -213,6 +215,19 @@ export class Pane implements IDestroyable {
 		}
 
 		this._cachedOrderedSources = null;
+	}
+
+	public getAllLineTools(): LineTool<LineToolType>[] {
+		return this._dataSources.filter((s: IPriceDataSource) => s instanceof LineTool).map((s: IPriceDataSource) => (s as LineTool<LineToolType>));
+	}
+
+	public getLineTool(id: string): LineTool<LineToolType> | null {
+		const lineTools = this._dataSources.filter((s: IPriceDataSource) => s instanceof LineTool && s.id() === id).map((s: IPriceDataSource) => (s as LineTool<LineToolType>));
+		return lineTools.length > 0 ? lineTools[0] : null;
+	}
+
+	public getSelectedLineTools(): LineTool<LineToolType>[] {
+		return this._dataSources.filter((s: IPriceDataSource) => s instanceof LineTool && (s as LineTool).selected()).map((s: IPriceDataSource) => (s as LineTool<LineToolType>));
 	}
 
 	public priceScalePosition(priceScale: PriceScale): PriceScalePosition {

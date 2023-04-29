@@ -13,7 +13,7 @@ export type EmptyCallback = () => void;
 export type PinchEventCallback = (middlePoint: Position, scale: number) => void;
 
 export interface IInputEventListener {
-	onInputEvent(paneWidget: PaneWidget, eventType: InputEventType, event?: TouchMouseEvent): void;
+	onInputEvent(paneWidget: PaneWidget, ctx: CanvasRenderingContext2D, eventType: InputEventType, event?: TouchMouseEvent): void;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -85,7 +85,7 @@ export interface MouseEventHandlerEventBase {
 	readonly srcType: string;
 
 	consumed?: boolean;
-	
+
 	target: MouseEvent['target'];
 	view: MouseEvent['view'];
 

@@ -2,7 +2,8 @@ import { DeepPartial } from '../helpers/strict-type-checks';
 
 import { BarPrice, BarPrices } from '../model/bar';
 import { ChartOptions } from '../model/chart-model';
-import { LineToolPoint } from '../model/line-tool';
+import { CustomPriceLine } from '../model/custom-price-line';
+import { LineToolExport, LineToolPoint } from '../model/line-tool';
 import { LineToolPartialOptionsMap, LineToolType } from '../model/line-tool-options';
 import { Point } from '../model/point';
 import { SeriesMarker } from '../model/series-markers';
@@ -60,6 +61,19 @@ export interface MouseEventParams {
  * A custom function use to handle mouse events.
  */
 export type MouseEventHandler = (param: MouseEventParams) => void;
+
+export interface CustomPriceLineDraggedEventParams {
+	customPriceLine: CustomPriceLine;
+	fromPriceString: string;
+}
+
+export type CustomPriceLineDraggedEventHandler = (param: CustomPriceLineDraggedEventParams) => void;
+
+export interface LineToolsDoubleClickEventParams {
+	selectedLineTool: LineToolExport<LineToolType>;
+}
+
+export type LineToolsDoubleClickEventHandler = (param: LineToolsDoubleClickEventParams) => void;
 
 /**
  * The main interface of a single chart.
@@ -162,6 +176,31 @@ export interface IChartApi {
 	setActiveLineTool<T extends LineToolType>(name: T, options: LineToolPartialOptionsMap[T]): void;
 
 	/**
+     * Remove the currently selected LineTool only.
+     */
+	removeSelectedLineTools(): void;
+
+    /**
+     * Remove All LineTools that have been drawn.
+     */
+	removeAllLineTools(): void;
+
+    /**
+     * Export all LineTools that have been drawn to a JSON string.  This export can be used with importLineTools(JSONstring) if you want to import them in the future
+     */
+	exportLineTools(): void;
+
+    /**
+     * Import a JSON string to recreate all LineTools that have previously been exported using exportLineTools().
+     */
+	importLineTools(json: string): boolean;
+
+    /**
+     * Apply new provided options to lineTool specified in the id field.
+     */
+	applyLineToolOptions(newLineTool: LineToolExport<LineToolType>): boolean;
+
+	/**
 	 * Removes a series of any type. This is an irreversible operation, you cannot do anything with the series after removing it.
 	 *
 	 * @example
@@ -230,6 +269,34 @@ export interface IChartApi {
 	 * ```
 	 */
 	unsubscribeCrosshairMove(handler: MouseEventHandler): void;
+
+	/**
+	 * Adds a subscription to receive notifications on custom price lines being dragged
+	 *
+	 * @param handler - handler (function) to be called on dragged
+	 */
+	subscribeCustomPriceLineDragged(handler: CustomPriceLineDraggedEventHandler): void;
+
+	/**
+	 * Removes custom price line dragged subscription
+	 *
+	 * @param handler - previously subscribed handler
+	 */
+	unsubscribeCustomPriceLineDragged(handler: CustomPriceLineDraggedEventHandler): void;
+
+	/**
+	 * Adds a subscription to receive notifications on linetools being double clicked
+	 *
+	 * @param handler - handler (function) to be called on double click
+	 */
+	subscribeLineToolsDoubleClick(handler: LineToolsDoubleClickEventHandler): void;
+
+	/**
+	 * Removes linetools being double clicked subscription
+	 *
+	 * @param handler - previously subscribed handler
+	 */
+	unsubscribeLineToolsDoubleClick(handler: LineToolsDoubleClickEventHandler): void;
 
 	/**
 	 * Returns API to manipulate a price scale.

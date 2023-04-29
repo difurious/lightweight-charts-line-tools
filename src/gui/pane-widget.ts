@@ -5,6 +5,7 @@ import { clearRect, clearRectWithGradient, drawScaled } from '../helpers/canvas-
 import { Delegate } from '../helpers/delegate';
 import { IDestroyable } from '../helpers/idestroyable';
 import { ISubscription } from '../helpers/isubscription';
+import { clone } from '../helpers/strict-type-checks';
 
 import { ChartModel, HoveredObject, TrackingModeExitMode } from '../model/chart-model';
 import { Coordinate } from '../model/coordinate';
@@ -265,19 +266,19 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		if (!this._state) {
 			return;
 		}
-		//this._onMouseEvent();
+		// this._onMouseEvent();
 
 		const x = event.localX;
 		const y = event.localY;
-		
+
 		if (this._preventCrosshairMove()) {
 			this._clearCrosshairPosition();
 		}
 
 		this._setCrosshairPosition(x, y);
 		this._propagateEvent(InputEventType.MouseMove, event);
-		//const hitTest = this.hitTest(x, y);
-		//this._model().setHoveredSource(hitTest && { source: hitTest.source, object: hitTest.object });
+		// const hitTest = this.hitTest(x, y);
+		// this._model().setHoveredSource(hitTest && { source: hitTest.source, object: hitTest.object });
 	}
 
 	public mouseClickEvent(event: MouseEventHandlerMouseEvent): void {
@@ -297,11 +298,33 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		this._tryExitTrackingMode();
 	}
 
+	public mouseDoubleClickEvent(event: MouseEventHandlerMouseEvent): void {
+		if (this._state === null) {
+			return;
+		}
+		this._onMouseEvent();
+		this._propagateEvent(InputEventType.MouseDoubleClick, event);
+
+		const selectedLineTools = this.state().getSelectedLineTools();
+		if (selectedLineTools.length > 0) {
+			const lineTool = selectedLineTools[0];
+			// While linetool is being created, we don't necessarely want to fire the event.
+			// for instance when finishing creating the path linetool.
+			if (lineTool.creating()) {
+				lineTool.setCreating(false);
+			} else {
+				// create a new lineToolExport to make sure that any change in the lineTool exported in not immediately applied.
+				const selectedLineTool = clone(selectedLineTools[0].exportLineToolToLineToolExport());
+				this._model().fireLineToolsDoubleClick(selectedLineTool);
+			}
+		}
+	}
+
 	public pressedMouseMoveEvent(event: MouseEventHandlerMouseEvent): void {
-		//this._onMouseEvent();
+		// this._onMouseEvent();
 		this._pressedMouseTouchMoveEvent(event);
-		//this._setCrosshairPosition(event.localX, event.localY);
-		//this._propagateEvent(InputEventType.PressedMouseMove, event);
+		// this._setCrosshairPosition(event.localX, event.localY);
+		// this._propagateEvent(InputEventType.PressedMouseMove, event);
 	}
 
 	public mouseUpEvent(event: MouseEventHandlerMouseEvent): void {
@@ -384,7 +407,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 			const newX = origPoint.x + (x - this._startTrackPoint.x) as Coordinate;
 			const newY = origPoint.y + (y - this._startTrackPoint.y) as Coordinate;
 			this._setCrosshairPosition(newX, newY);
-			//return;
+			// return;
 		} else if (!this._preventCrosshairMove()) {
 			this._setCrosshairPosition(x, y);
 		}
@@ -523,18 +546,20 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		if (this._state === null) { return; }
 		this.setCursor(PaneCursorType.Crosshair);
 
+		const ctx = getContext2D(this.getImage());
+
 		// if (this._model().lineToolCreator().hasActiveToolLine()) {
-		this._model().lineToolCreator().onInputEvent(this, type, event);
+		this._model().lineToolCreator().onInputEvent(this, ctx, type, event);
 		// }
 
 		const sources = this._state.orderedSources();
 		for (let index = sources.length - 1; index >= 0; index--) {
 			const sourcePane = this._model().paneForSource(sources[index]);
 			if (sourcePane !== null) {
-				const paneViews = sources[index].paneViews(sourcePane as Pane);
+				const paneViews = sources[index].paneViews(sourcePane);
 				paneViews.forEach((pane: IPaneView) => {
 					if (isInputEventListener(pane)) {
-						pane.onInputEvent(this, type, event);
+						pane.onInputEvent(this, ctx, type, event);
 					}
 				});
 			}
@@ -671,7 +696,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 	}
 
 	private _preventCrosshairMove(): boolean {
-		return /*trackCrosshairOnlyAfterLongTap && */this._startTrackPoint === null;
+		return /* trackCrosshairOnlyAfterLongTap && */this._startTrackPoint === null;
 	}
 
 	private _preventScroll(event: TouchMouseEvent): boolean {
@@ -810,7 +835,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 			return;
 		}
 
-		const model = this._model();		
+		const model = this._model();
 		const x = event.localX;
 		const y = event.localY;
 
@@ -821,7 +846,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 			const newX = (origPoint.x + (x - this._startTrackPoint.x)) as Coordinate;
 			const newY = (origPoint.y + (y - this._startTrackPoint.y)) as Coordinate;
 			this._setCrosshairPosition(newX, newY);
-		//} else if (!this._preventCrosshairMove()) { // in case of mouse event, always return false in drawings repo
+		// } else if (!this._preventCrosshairMove()) { // in case of mouse event, always return false in drawings repo
 		} else {
 			this._setCrosshairPosition(x, y);
 		}

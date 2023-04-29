@@ -3,7 +3,7 @@ import { Point } from '../model/point';
 import { LineStyle } from '..';
 import { setLineStyle } from './draw-line';
 
-export function drawRoundRect(ctx: CanvasRenderingContext2D, x: number, y: number, width: number, height: number, radius: number | number[]): void {
+export function drawRoundRect(ctx: CanvasRenderingContext2D, x: number, y: number, width: number, height: number, radius: number | number[], borderStyle?: number): void {
 	let a; let b; let c; let d;
 
 	if (Array.isArray(radius)) {
@@ -30,6 +30,9 @@ export function drawRoundRect(ctx: CanvasRenderingContext2D, x: number, y: numbe
 	}
 
 	ctx.beginPath();
+
+	setLineStyle(ctx, borderStyle || LineStyle.Solid);
+
 	ctx.moveTo(x + a, y);
 	ctx.lineTo(x + width - b, y);
 	if (b !== 0) { ctx.arcTo(x + width, y, x + width, y + b, b); }
@@ -39,6 +42,7 @@ export function drawRoundRect(ctx: CanvasRenderingContext2D, x: number, y: numbe
 	if (d !== 0) { ctx.arcTo(x, y + height, x, y + height - d, d); }
 	ctx.lineTo(x, y + a);
 	if (a !== 0) { ctx.arcTo(x, y, x + a, y, a); }
+	ctx.stroke();
 }
 
 // eslint-disable-next-line max-params

@@ -82,7 +82,7 @@ export class FibRetracementPaneView extends LineToolPaneView {
 				this._rectangleRenderers[j].setData({
 					...options.line,
 					extend: options.extend,
-					background: { color: applyAlpha(options.levels[i].color, 0.2) },
+					background: { color: applyAlpha(options.levels[i].color, options.levels[i].opacity) },
 					points: [new AnchorPoint(minX, levelCoordinates[i - 1].coordinate, 0), new AnchorPoint(maxX, levelCoordinates[i].coordinate, 0)],
 				});
 				compositeRenderer.append(this._rectangleRenderers[j]);

@@ -19,7 +19,7 @@ export class LineToolPath extends LineTool<'Path'> {
 	}
 
 	public override tryFinish(): void {
-		if (this._points.length > 0) {
+		if (this._points.length > 1) {
 			const point0 = this._points[this._points.length - 1];
 			const point1 = this._points[this._points.length - 2];
 			const screenPoint0 = ensureNotNull(this.pointToScreenPoint(point0));

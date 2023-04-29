@@ -1,4 +1,4 @@
-import { ChartWidget, MouseEventParamsImpl, MouseEventParamsImplSupplier } from '../gui/chart-widget';
+import { ChartWidget, CustomPriceLineDraggedEventParamsImpl, CustomPriceLineDraggedEventParamsImplSupplier, LineToolsDoubleClickEventParamsImpl, LineToolsDoubleClickEventParamsImplSupplier, MouseEventParamsImpl, MouseEventParamsImplSupplier } from '../gui/chart-widget';
 
 import { ensureDefined } from '../helpers/assertions';
 import { Delegate } from '../helpers/delegate';
@@ -8,8 +8,9 @@ import { clone, DeepPartial, isBoolean, merge } from '../helpers/strict-type-che
 import { BarPrice, BarPrices } from '../model/bar';
 import { ChartOptions, ChartOptionsInternal } from '../model/chart-model';
 import { ColorType } from '../model/layout-options';
-import { LineToolPoint } from '../model/line-tool';
+import { LineTool, LineToolExport, LineToolPoint } from '../model/line-tool';
 import { LineToolOptionsMap, LineToolPartialOptionsMap, LineToolType } from '../model/line-tool-options';
+import { Pane } from '../model/pane';
 import { Series } from '../model/series';
 import {
 	AreaSeriesOptions,
@@ -34,8 +35,7 @@ import {
 import { CandlestickSeriesApi } from './candlestick-series-api';
 import { DataUpdatesConsumer, SeriesDataItemTypeMap } from './data-consumer';
 import { DataLayer, DataUpdateResponse, SeriesChanges } from './data-layer';
-import { IChartApi, MouseEventHandler, MouseEventParams } from './ichart-api';
-import { ILineToolApi } from './iline-tool-api';
+import { CustomPriceLineDraggedEventHandler, CustomPriceLineDraggedEventParams, IChartApi, LineToolsDoubleClickEventHandler, LineToolsDoubleClickEventParams, MouseEventHandler, MouseEventParams } from './ichart-api';
 import { IPriceScaleApi } from './iprice-scale-api';
 import { ISeriesApi } from './iseries-api';
 import { ITimeScaleApi } from './itime-scale-api';
@@ -164,6 +164,8 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 
 	private readonly _clickedDelegate: Delegate<MouseEventParams> = new Delegate();
 	private readonly _crosshairMovedDelegate: Delegate<MouseEventParams> = new Delegate();
+	private readonly _customPriceLineDraggedDelegate: Delegate<CustomPriceLineDraggedEventParams> = new Delegate();
+	private readonly _lineToolsDoubleClickDelegate: Delegate<LineToolsDoubleClickEventParams> = new Delegate();
 
 	private readonly _timeScaleApi: TimeScaleApi;
 
@@ -191,6 +193,24 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 			this
 		);
 
+		this._chartWidget.customPriceLineDragged().subscribe(
+			(paramSupplier: CustomPriceLineDraggedEventParamsImplSupplier) => {
+				if (this._customPriceLineDraggedDelegate.hasListeners()) {
+					this._customPriceLineDraggedDelegate.fire(this._convertCustomPriceLineDraggedParams(paramSupplier()));
+				}
+			},
+			this
+		);
+
+		this._chartWidget.lineToolsDoubleClick().subscribe(
+			(paramSupplier: LineToolsDoubleClickEventParamsImplSupplier) => {
+				if (this._lineToolsDoubleClickDelegate.hasListeners()) {
+					this._lineToolsDoubleClickDelegate.fire(this._convertLineToolsDoubleClickParams(paramSupplier()));
+				}
+			},
+			this
+		);
+
 		const model = this._chartWidget.model();
 		this._timeScaleApi = new TimeScaleApi(model, this._chartWidget.timeAxisWidget());
 	}
@@ -198,6 +218,8 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 	public remove(): void {
 		this._chartWidget.clicked().unsubscribeAll(this);
 		this._chartWidget.crosshairMoved().unsubscribeAll(this);
+		this._chartWidget.customPriceLineDragged().unsubscribeAll(this);
+		this._chartWidget.lineToolsDoubleClick().unsubscribeAll(this);
 
 		this._timeScaleApi.destroy();
 		this._chartWidget.destroy();
@@ -207,6 +229,8 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 
 		this._clickedDelegate.destroy();
 		this._crosshairMovedDelegate.destroy();
+		this._customPriceLineDraggedDelegate.destroy();
+		this._lineToolsDoubleClickDelegate.destroy();
 		this._dataLayer.destroy();
 	}
 
@@ -313,7 +337,7 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		this._seriesMapReversed.delete(series);
 	}
 
-	public addLineTool<T extends LineToolType>(name: T, points: LineToolPoint[], options?: LineToolPartialOptionsMap[T]): ILineToolApi<T> {
+	public addLineTool<T extends LineToolType>(name: T, points: LineToolPoint[], options?: LineToolPartialOptionsMap[T]): LineToolApi<T> {
 		const strictOptions = merge(clone(LineToolsOptionDefaults[name]), options || {}) as LineToolOptionsMap[T];
 		const tool = this._chartWidget.model().createLineTool(name, strictOptions, points);
 		return new LineToolApi<T>(tool);
@@ -321,6 +345,75 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 
 	public setActiveLineTool<T extends LineToolType>(name: T, options?: LineToolPartialOptionsMap[T]): void {
 		this._chartWidget.model().lineToolCreator().setActiveLineTool(name, options);
+	}
+
+	public removeSelectedLineTools(): void {
+		const pane = this._getPane();
+		if (pane === null) { return; }
+		const selectedLineTools = pane.getSelectedLineTools();
+		if (selectedLineTools.length > 0) {
+			selectedLineTools.forEach((line: LineTool<LineToolType>) => { pane.removeDataSource(line); });
+			pane.recalculate();
+		}
+	}
+
+	public removeAllLineTools(): void {
+		const pane = this._getPane();
+		if (pane === null) { return; }
+		const selectedLineTools = pane.getAllLineTools();
+		if (selectedLineTools.length > 0) {
+			selectedLineTools.forEach((line: LineTool<LineToolType>) => { pane.removeDataSource(line); });
+			pane.recalculate();
+		}
+	}
+
+	public exportLineTools(): string {
+		let lineToolsOptions: LineToolExport<LineToolType>[] = [];
+		const pane = this._getPane();
+		if (pane === null) {
+			return JSON.stringify(lineToolsOptions);
+		}
+		const lineTools = pane.getAllLineTools();
+		if (lineTools.length > 0) {
+			lineToolsOptions = lineTools.map((l: LineTool<LineToolType>) => l.exportLineToolToLineToolExport());
+		}
+		return JSON.stringify(lineToolsOptions);
+	}
+
+	public importLineTools(json: string): boolean {
+		if (json === 'undefined' || !json) {
+			return false;
+		}
+		const lineTools = JSON.parse(json) as LineToolExport<LineToolType>[];
+
+		lineTools.forEach((line: LineToolExport<LineToolType>) => {
+			const lineToolApi = this.addLineTool<LineToolType>(line.toolType, line.points, line.options);
+			lineToolApi.lineTool.setId(line.id);
+		});
+
+		const pane = this._getPane();
+		if (pane !== null) {
+			pane.recalculate();
+		}
+		return true;
+	}
+
+	public applyLineToolOptions(newLineTool: LineToolExport<LineToolType>): boolean {
+		const pane = this._getPane();
+		if (pane === null) {
+			return false;
+		}
+
+		const lineTool = pane.getLineTool(newLineTool.id);
+		if (lineTool === null) {
+			return false;
+		}
+
+		lineTool.setPoints(newLineTool.points);
+		const lineToolApi = new LineToolApi(lineTool);
+		lineToolApi.applyOptions(newLineTool.options);
+
+		return true;
 	}
 
 	public applyNewData<TSeriesType extends SeriesType>(series: Series<TSeriesType>, data: SeriesDataItemTypeMap[TSeriesType][]): void {
@@ -345,6 +438,22 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 
 	public unsubscribeCrosshairMove(handler: MouseEventHandler): void {
 		this._crosshairMovedDelegate.unsubscribe(handler);
+	}
+
+	public subscribeCustomPriceLineDragged(handler: CustomPriceLineDraggedEventHandler): void {
+		this._customPriceLineDraggedDelegate.subscribe(handler);
+	}
+
+	public unsubscribeCustomPriceLineDragged(handler: CustomPriceLineDraggedEventHandler): void {
+		this._customPriceLineDraggedDelegate.unsubscribe(handler);
+	}
+
+	public subscribeLineToolsDoubleClick(handler: LineToolsDoubleClickEventHandler): void {
+		this._lineToolsDoubleClickDelegate.subscribe(handler);
+	}
+
+	public unsubscribeLineToolsDoubleClick(handler: LineToolsDoubleClickEventHandler): void {
+		this._lineToolsDoubleClickDelegate.unsubscribe(handler);
 	}
 
 	public priceScale(priceScaleId?: string): IPriceScaleApi {
@@ -385,6 +494,10 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		return ensureDefined(this._seriesMapReversed.get(series));
 	}
 
+	private _getPane(): Pane | null {
+		return this._chartWidget.model().getActivePane();
+	}
+
 	private _convertMouseParams(param: MouseEventParamsImpl): MouseEventParams {
 		const seriesPrices = new Map<ISeriesApi<SeriesType>, BarPrice | BarPrices>();
 		param.seriesPrices.forEach((price: BarPrice | BarPrices, series: Series) => {
@@ -399,6 +512,19 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 			hoveredSeries,
 			hoveredMarkerId: param.hoveredObject,
 			seriesPrices,
+		};
+	}
+
+	private _convertCustomPriceLineDraggedParams(param: CustomPriceLineDraggedEventParamsImpl): CustomPriceLineDraggedEventParams {
+		return {
+			customPriceLine: param.customPriceLine,
+			fromPriceString: param.fromPriceString,
+		};
+	}
+
+	private _convertLineToolsDoubleClickParams(param: LineToolsDoubleClickEventParamsImpl): LineToolsDoubleClickEventParams {
+		return {
+			selectedLineTool: param.selectedLineTool,
 		};
 	}
 }

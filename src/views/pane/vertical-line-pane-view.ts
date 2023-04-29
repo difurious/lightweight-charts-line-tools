@@ -59,7 +59,7 @@ export class VerticalLinePaneView extends LineToolPaneView {
 
 			compositeRenderer.append(this._lineRenderer);
 			if (options.text.value) {
-				const angle = Math.atan((end.y - start.y) / (end.x - start.x));
+				const angle = Math.atan((end.y - start.y) / (end.x - start.x)) / Math.PI * -180;
 				const align = options.text.box.alignment.horizontal;
 				const pivot = align === BoxHorizontalAlignment.Left
 					? start.clone() : align === BoxHorizontalAlignment.Right

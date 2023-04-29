@@ -6,10 +6,10 @@ import { LineToolOptionsMap, LineToolPartialOptionsMap, LineToolType } from '../
 import { ILineToolApi } from './iline-tool-api';
 
 export class LineToolApi<TLineToolType extends LineToolType> implements ILineToolApi<TLineToolType> {
-	protected _lineTool: LineTool<TLineToolType>;
+	public lineTool: LineTool<TLineToolType>;
 
 	public constructor(lineTool: LineTool<TLineToolType>) {
-		this._lineTool = lineTool;
+		this.lineTool = lineTool;
 	}
 
 	public setPoints(points: LineToolPoint[]): void {
@@ -17,14 +17,14 @@ export class LineToolApi<TLineToolType extends LineToolType> implements ILineToo
 	}
 
 	public applyOptions(options: LineToolPartialOptionsMap[TLineToolType]): void {
-		this._lineTool.applyOptions(options);
+		this.lineTool.applyOptions(options);
 	}
 
 	public options(): Readonly<LineToolOptionsMap[TLineToolType]> {
-		return clone(this._lineTool.options());
+		return clone(this.lineTool.options());
 	}
 
 	public toolType(): LineToolType {
-		return this._lineTool.toolType();
+		return this.lineTool.toolType();
 	}
 }

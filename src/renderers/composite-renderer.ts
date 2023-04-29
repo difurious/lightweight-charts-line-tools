@@ -1,11 +1,11 @@
 import { Coordinate } from '../model/coordinate';
 import { HitTestResult } from '../model/hit-test-result';
+
 import { IPaneRenderer } from './ipane-renderer';
 
 export class CompositeRenderer implements IPaneRenderer {
 	private _renderers: IPaneRenderer[] = [];
 	private _globalAlpha: number = 1;
-
 
 	public setGlobalAlpha(value: number): void {
 		this._globalAlpha = value;
@@ -26,7 +26,7 @@ export class CompositeRenderer implements IPaneRenderer {
 	public isEmpty(): boolean {
 		return this._renderers.length === 0;
 	}
-	
+
 	public setRenderers(renderers: IPaneRenderer[]): void {
 		this._renderers = renderers;
 	}
@@ -40,12 +40,12 @@ export class CompositeRenderer implements IPaneRenderer {
 		});
 	}
 
-	public hitTest(x: Coordinate, y: Coordinate): HitTestResult<unknown> | null {
+	public hitTest(x: Coordinate, y: Coordinate, ctx: CanvasRenderingContext2D): HitTestResult<unknown> | null {
 		let result = null;
 		for (let i = this._renderers.length - 1; i >= 0; i--) {
 			const renderer = this._renderers[i];
 			if (renderer.hitTest) {
-				result = renderer.hitTest(x, y) || null;
+				result = renderer.hitTest(x, y, ctx) || null;
 			}
 			if (result) { break; }
 		}

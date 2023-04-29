@@ -15,7 +15,7 @@ export const TextDefaults: TextOptions = {
 	forceCalculateMaxLineWidth: false,
 	alignment: TextAlignment.Left,
 	font: { family: defaultFontFamily, color: '#2962ff', size: 12, bold: false, italic: false },
-	box: { scale: 1, angle: 0, alignment: { vertical: BoxVerticalAlignment.Bottom, horizontal: BoxHorizontalAlignment.Left } },
+	box: { scale: 1, angle: 0, alignment: { vertical: BoxVerticalAlignment.Top, horizontal: BoxHorizontalAlignment.Left } },
 };
 
 export const TrendLineOptionDefaults: TrendLineToolOptions = {
@@ -56,17 +56,17 @@ export const FibRetracementOptionDefaults: FibRetracementToolOptions = {
 	extend: { left: false, right: false },
 	line: { width: 1, style: LineStyle.Solid },
 	levels: [
-        { color: '#787b86', coeff: 0 },
-        { color: '#f23645', coeff: 0.236 },
-        { color: '#81c784', coeff: 0.382 },
-        { color: '#4caf50', coeff: 0.5 },
-        { color: '#089981', coeff: 0.618 },
-        { color: '#64b5f6', coeff: 0.786 },
-        { color: '#787b86', coeff: 1 },
-        { color: '#2962ff', coeff: 1.618 },
-        { color: '#f23645', coeff: 2.618 },
-        { color: '#9c27b0', coeff: 3.618 },
-        { color: '#e91e63', coeff: 4.236 },
+        { color: '#787b86', coeff: 0, opacity: 0 },
+        { color: '#f23645', coeff: 0.236, opacity: 0 },
+        { color: '#81c784', coeff: 0.382, opacity: 0 },
+        { color: '#4caf50', coeff: 0.5, opacity: 0 },
+        { color: '#089981', coeff: 0.618, opacity: 0 },
+        { color: '#64b5f6', coeff: 0.786, opacity: 0 },
+        { color: '#787b86', coeff: 1, opacity: 0 },
+        { color: '#2962ff', coeff: 1.618, opacity: 0 },
+        { color: '#f23645', coeff: 2.618, opacity: 0 },
+        { color: '#9c27b0', coeff: 3.618, opacity: 0 },
+        { color: '#e91e63', coeff: 4.236, opacity: 0 },
 	],
 };
 

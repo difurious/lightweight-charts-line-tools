@@ -28,7 +28,7 @@ export class TextPaneView extends LineToolPaneView {
 
 		const options = this._source.options() as LineToolOptionsInternal<'Text'>;
 		const data = deepCopy(options.text) as TextOptions;
-		data.box.alignment = { vertical: BoxVerticalAlignment.Bottom, horizontal: BoxHorizontalAlignment.Center };
+		data.box.alignment = { vertical: BoxVerticalAlignment.Top, horizontal: BoxHorizontalAlignment.Center };
 		data.alignment = TextAlignment.Center;
 		const point = this._points[0].clone();
 

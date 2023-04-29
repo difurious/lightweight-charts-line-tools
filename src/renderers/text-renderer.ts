@@ -8,7 +8,6 @@ import { pointInBox, pointInPolygon } from '../model/interesection';
 import { BoxHorizontalAlignment, BoxVerticalAlignment, TextAlignment, TextOptions } from '../model/line-tool-options';
 import { Box, Point, Rect } from '../model/point';
 
-import { LineStyle, setLineStyle } from './draw-line';
 import { drawRoundRect } from './draw-rect';
 import { IPaneRenderer } from './ipane-renderer';
 
@@ -175,10 +174,12 @@ export class TextRenderer implements IPaneRenderer {
 		const textData = this._data.text;
 		const internalData = this._getInternalData();
 		const pivot = this._getRotationPoint().scaled(pixelRatio);
+		const angleDegrees = textData.box?.angle || 0;
+		const angle = -angleDegrees * Math.PI / 180;
 
 		ctx.save();
 		ctx.translate(pivot.x, pivot.y);
-		ctx.rotate(textData.box?.angle || 0);
+		ctx.rotate(angle);
 		ctx.translate(-pivot.x, -pivot.y);
 
 		const fontSize = this._getFontInfo().fontSize;
@@ -206,48 +207,28 @@ export class TextRenderer implements IPaneRenderer {
 				ctxUpdated = true;
 			}
 
-			if (textData.box.border?.radius) {
-				if (textData.box.background?.color) {
-					const radius = textData.box?.border?.radius * pixelRatio;
-					drawRoundRect(ctx, scaledLeft, scaledTop, scaledRight - scaledLeft, scaledBottom - scaledTop, radius);
-					ctx.fillStyle = textData.box?.background?.color;
-					ctx.fill();
-					if (ctxUpdated) { ctx.restore(); ctxUpdated = false; }
-				}
-
+			if (textData.box.border?.width) {
 				if (textData.box.border?.color) {
-					const radius = textData.box?.border?.radius * pixelRatio + borderWidth;
-					drawRoundRect(ctx, scaledLeft - halfBorderWidth, scaledTop - halfBorderWidth, scaledRight - scaledLeft + borderWidth, scaledBottom - scaledTop + borderWidth, radius);
 					ctx.strokeStyle = textData.box.border.color;
-					ctx.lineWidth = borderWidth;
-					if (ctxUpdated) { ctx.restore(); ctxUpdated = false; }
 				}
-			} else if (textData.box.background?.color) {
-				ctx.fillStyle = textData.box.background.color;
-				ctx.fillRect(scaledLeft, scaledTop, scaledRight - scaledLeft, scaledBottom - scaledTop);
+				ctx.lineWidth = borderWidth;
+
+				const radius = textData.box?.border?.radius ?? 0 * pixelRatio + borderWidth;
+				const textBoxBorderStyle = textData.box?.border?.style;
+				drawRoundRect(ctx, scaledLeft - halfBorderWidth, scaledTop - halfBorderWidth, scaledRight - scaledLeft + borderWidth, scaledBottom - scaledTop + borderWidth, radius, textBoxBorderStyle);
+
+				if (textData.box.background?.color) {
+					ctx.fillStyle = textData.box.background.color;
+					ctx.fill();
+				}
+
 				if (ctxUpdated) { ctx.restore(); ctxUpdated = false; }
-			} else if (textData.box?.border?.color || textData.box?.border?.highlight) {
-				let usedBorderWidth;
-				if (textData.box?.border?.color) {
-					ctx.strokeStyle = textData.box?.border?.color;
-					usedBorderWidth = borderWidth;
-				} else {
-					ctx.strokeStyle = textData.font?.color as string;
-					setLineStyle(ctx, LineStyle.Dashed);
-					usedBorderWidth = Math.max(1, Math.floor(pixelRatio));
+			} else {
+				if (textData.box.background?.color) {
+					ctx.fillStyle = textData.box.background.color;
+					ctx.fillRect(scaledLeft, scaledTop, scaledRight - scaledLeft, scaledBottom - scaledTop);
 				}
-
-				ctx.lineWidth = usedBorderWidth;
-
-				ctx.beginPath();
-				ctx.moveTo(scaledLeft - usedBorderWidth / 2, scaledTop - usedBorderWidth / 2);
-				ctx.lineTo(scaledLeft - usedBorderWidth / 2, scaledBottom + usedBorderWidth / 2);
-				ctx.lineTo(scaledRight + usedBorderWidth / 2, scaledBottom + usedBorderWidth / 2);
-				ctx.lineTo(scaledRight + usedBorderWidth / 2, scaledTop - usedBorderWidth / 2);
-				ctx.lineTo(scaledLeft - usedBorderWidth / 2, scaledTop - usedBorderWidth / 2);
-				ctx.stroke();
-
-				if (ctxUpdated) { ctx.restore(); }
+				if (ctxUpdated) { ctx.restore(); ctxUpdated = false; }
 			}
 		}
 
@@ -284,13 +265,13 @@ export class TextRenderer implements IPaneRenderer {
 		let anchorX = anchor.x as number;
 
 		switch (data.text?.box?.alignment?.vertical) {
-			case BoxVerticalAlignment.Bottom:
+			case BoxVerticalAlignment.Top:
 				anchorY -= boxHeight + (data.text?.box?.offset?.y || 0);
 				break;
 			case BoxVerticalAlignment.Middle:
 				anchorY -= boxHeight / 2;
 				break;
-			case BoxVerticalAlignment.Top:
+			case BoxVerticalAlignment.Bottom:
 				anchorY += (data.text?.box?.offset?.y || 0);
 		}
 
@@ -309,6 +290,7 @@ export class TextRenderer implements IPaneRenderer {
 				anchorX -= boxWidth + (data.text?.box?.offset?.x || 0);
 		}
 		switch (ensureDefined(data.text?.alignment)) {
+			case TextAlignment.Start:
 			case TextAlignment.Left: {
 				textAlign = TextAlignment.Start;
 				textX = anchorX + inflationPaddingX;
@@ -328,6 +310,7 @@ export class TextRenderer implements IPaneRenderer {
 				textX = anchorX + boxWidth / 2;
 				break;
 			case TextAlignment.Right:
+			case TextAlignment.End:
 				textAlign = TextAlignment.End;
 				textX = anchorX + boxWidth - inflationPaddingX;
 				if (isRtl() && data.text?.forceTextAlign) {
@@ -411,7 +394,8 @@ export class TextRenderer implements IPaneRenderer {
 
 		const { boxLeft, boxTop, boxWidth, boxHeight } = this._getInternalData();
 		const pivot = this._getRotationPoint();
-		const angle = this._data.text?.box?.angle || 0;
+		const angleDegrees = this._data.text?.box?.angle || 0;
+		const angle = -angleDegrees * Math.PI / 180;
 		this._polygonPoints = [
 			rotatePoint(new Point(boxLeft, boxTop), pivot, angle),
 			rotatePoint(new Point(boxLeft + boxWidth, boxTop), pivot, angle),
@@ -442,10 +426,10 @@ export class TextRenderer implements IPaneRenderer {
 			case BoxVerticalAlignment.Middle:
 				y = boxTop + boxHeight / 2;
 				break;
-			case BoxVerticalAlignment.Top:
+			case BoxVerticalAlignment.Bottom:
 				y = boxTop;
 				break;
-			case BoxVerticalAlignment.Bottom:
+			case BoxVerticalAlignment.Top:
 				y = boxTop + boxHeight;
 		}
 		return new Point(x, y);

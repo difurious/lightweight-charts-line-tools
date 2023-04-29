@@ -30,6 +30,7 @@ export class LineToolCreator implements IInputEventListener {
 				source.setSelected(false);
 				source.setHovered(false);
 				source.setEditing(false);
+				source.setCreating(false);
 			}
 		});
 		this._model.lightUpdate();
@@ -39,7 +40,7 @@ export class LineToolCreator implements IInputEventListener {
 		return this._activeType !== null;
 	}
 
-	public onInputEvent(paneWidget: PaneWidget, eventType: InputEventType, event: TouchMouseEvent): void {
+	public onInputEvent(paneWidget: PaneWidget, ctx: CanvasRenderingContext2D, eventType: InputEventType, event: TouchMouseEvent): void {
 		if (!this._activeType || !this._activeOptions) { return; }
 		event.consumed = true;
 		if (eventType !== InputEventType.MouseDown) { return; }

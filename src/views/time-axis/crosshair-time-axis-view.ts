@@ -61,7 +61,7 @@ export class CrosshairTimeAxisView implements ITimeAxisView {
 		const currentTime = timeScale.floatIndexToTime(this._crosshair.appliedIndex());
 		data.width = timeScale.width();
 
-// Shinobaki - Useless. Not removed just to keep constructor arguments untouched.
+		// Useless. Not removed just to keep constructor arguments untouched.
 		const value = this._valueProvider();
 		data.coordinate = value.coordinate;
 		/*if (!value.time) {

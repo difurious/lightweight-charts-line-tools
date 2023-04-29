@@ -9,20 +9,20 @@ import { Coordinate } from '../../model/coordinate';
 import { HitTestResult, HitTestType } from '../../model/hit-test-result';
 import { LineTool, LineToolHitTestData, LineToolPoint } from '../../model/line-tool';
 import { LineToolType } from '../../model/line-tool-options';
-import { /*Pane,*/ PaneCursorType } from '../../model/pane';
+import { PaneCursorType } from '../../model/pane';
 import { Point } from '../../model/point';
 import { CompositeRenderer } from '../../renderers/composite-renderer';
 import { IPaneRenderer } from '../../renderers/ipane-renderer';
 import { AnchorPoint, LineAnchorRenderer } from '../../renderers/line-anchor-renderer';
 
-import { IPaneView } from './ipane-view';
+import { IUpdatablePaneView } from './iupdatable-pane-view';
 
 export interface CreateAnchorData {
 	points: AnchorPoint[];
 	pointsCursorType?: PaneCursorType[];
 }
 
-export abstract class LineToolPaneView implements IPaneView, IInputEventListener {
+export abstract class LineToolPaneView implements IUpdatablePaneView, IInputEventListener {
 	protected readonly _source: LineTool<LineToolType>;
 	protected readonly _model: ChartModel;
 	protected _points: AnchorPoint[] = [];
@@ -39,7 +39,7 @@ export abstract class LineToolPaneView implements IPaneView, IInputEventListener
 	}
 
 	// eslint-disable-next-line complexity
-	public onInputEvent(paneWidget: PaneWidget, eventType: InputEventType, event?: TouchMouseEvent): void {
+	public onInputEvent(paneWidget: PaneWidget, ctx: CanvasRenderingContext2D, eventType: InputEventType, event?: TouchMouseEvent): void {
 		if (!event || (!this._renderer || !this._renderer.hitTest) && this._source.finished()) { return; }
 
 		const crossHair = this._model.crosshairSource();
@@ -47,11 +47,11 @@ export abstract class LineToolPaneView implements IPaneView, IInputEventListener
 		const originPoint = new Point(crossHair.originCoordX(), crossHair.originCoordY());
 
 		const changed = eventType === InputEventType.PressedMouseMove && !event.consumed
-			? this._onPressedMouseMove(paneWidget, originPoint, appliedPoint)
+			? this._onPressedMouseMove(paneWidget, ctx, originPoint, appliedPoint, event)
 			: eventType === InputEventType.MouseMove
-			? this._onMouseMove(paneWidget, originPoint, appliedPoint, event)
+			? this._onMouseMove(paneWidget, ctx, originPoint, appliedPoint, event)
 			: eventType === InputEventType.MouseDown
-			? this._onMouseDown(paneWidget, originPoint, appliedPoint, event)
+			? this._onMouseDown(paneWidget, ctx, originPoint, appliedPoint, event)
 			: eventType === InputEventType.MouseUp
 			? this._onMouseUp()
 			: false;
@@ -62,7 +62,7 @@ export abstract class LineToolPaneView implements IPaneView, IInputEventListener
 		}
 	}
 
-	public renderer(height: number, width: number, addAnchors?: boolean | undefined/*, pane: Pane*/): IPaneRenderer | null {
+	public renderer(height: number, width: number, addAnchors?: boolean | undefined): IPaneRenderer | null {
 		if (this._invalidated) { this._updateImpl(height, width); }
 		return this._source.visible() ? this._renderer : null;
 	}
@@ -141,12 +141,13 @@ export abstract class LineToolPaneView implements IPaneView, IInputEventListener
 			this._lastMovePoint = null;
 			this._editedPointIndex = null;
 			this._source.setEditing(false);
+			this._source.setCreating(false);
 			return true;
 		}
 		return false;
 	}
 
-	protected _onPressedMouseMove(paneWidget: PaneWidget, originPoint: Point, appliedPoint: Point): boolean {
+	protected _onPressedMouseMove(paneWidget: PaneWidget, ctx: CanvasRenderingContext2D, originPoint: Point, appliedPoint: Point, event: TouchMouseEvent): boolean {
 		if (!this._source.finished()) {
 			if (this._source.lineDrawnWithPressedButton()) {
 				this._source.addPoint(this._source.screenPointToPoint(appliedPoint) as LineToolPoint);
@@ -157,7 +158,7 @@ export abstract class LineToolPaneView implements IPaneView, IInputEventListener
 		if (!this._source.selected()) { return false; }
 
 		if (!this._source.editing()) {
-			const hitResult = this._hitTest(paneWidget, originPoint);
+			const hitResult = this._hitTest(paneWidget, ctx, originPoint);
 			const hitData = hitResult?.data();
 			this._source.setEditing(this._source.hovered() || !!hitResult);
 
@@ -168,6 +169,8 @@ export abstract class LineToolPaneView implements IPaneView, IInputEventListener
 			paneWidget.setCursor(this._editedPointIndex !== null ? PaneCursorType.Default : PaneCursorType.Grabbing);
 
 			if (this._editedPointIndex !== null) {
+				this._tryApplyLineToolShift(appliedPoint, event, true);
+
 				this._source.setPoint(this._editedPointIndex, this._source.screenPointToPoint(appliedPoint) as LineToolPoint);
 			} else if (this._lastMovePoint) {
 				const diff = appliedPoint.subtract(this._lastMovePoint);
@@ -183,12 +186,15 @@ export abstract class LineToolPaneView implements IPaneView, IInputEventListener
 		return false;
 	}
 
-	protected _onMouseMove(paneWidget: PaneWidget, originPoint: Point, appliedPoint: Point, event: TouchMouseEvent): boolean {
+	protected _onMouseMove(paneWidget: PaneWidget, ctx: CanvasRenderingContext2D, originPoint: Point, appliedPoint: Point, event: TouchMouseEvent): boolean {
 		if (!this._source.finished()) {
 			if (this._source.hasMagnet()) { this._model.magnet().enable(); }
+
+			this._tryApplyLineToolShift(appliedPoint, event, false);
+
 			this._source.setLastPoint(this._source.screenPointToPoint(appliedPoint) as LineToolPoint);
 		} else {
-			const hitResult = this._hitTest(paneWidget, originPoint);
+			const hitResult = this._hitTest(paneWidget, ctx, originPoint);
 			const changed = this._source.setHovered(hitResult !== null && !event.consumed);
 
 			if (this._source.hovered() && !event.consumed) {
@@ -202,12 +208,14 @@ export abstract class LineToolPaneView implements IPaneView, IInputEventListener
 		return false;
 	}
 
-	protected _onMouseDown(paneWidget: PaneWidget, originPoint: Point, appliedPoint: Point, event: TouchMouseEvent): boolean {
+	protected _onMouseDown(paneWidget: PaneWidget, ctx: CanvasRenderingContext2D, originPoint: Point, appliedPoint: Point, event: TouchMouseEvent): boolean {
 		if (!this._source.finished()) {
+			this._tryApplyLineToolShift(appliedPoint, event, false);
+
 			this._source.addPoint(this._source.screenPointToPoint(appliedPoint) as LineToolPoint);
 			return false;
 		} else {
-			const hitResult = this._hitTest(paneWidget, originPoint);
+			const hitResult = this._hitTest(paneWidget, ctx, originPoint);
 			return this._source.setSelected(hitResult !== null && !event.consumed);
 		}
 	}
@@ -216,9 +224,9 @@ export abstract class LineToolPaneView implements IPaneView, IInputEventListener
 		this._source.setPoints(this._points.map((point: Point) => this._source.screenPointToPoint(point) as LineToolPoint));
 	}
 
-	protected _hitTest(paneWidget: PaneWidget, point: Point): HitTestResult<LineToolHitTestData> | null {
+	protected _hitTest(paneWidget: PaneWidget, ctx: CanvasRenderingContext2D, point: Point): HitTestResult<LineToolHitTestData> | null {
 		if (!this._renderer?.hitTest) { return null; }
-		return this._renderer.hitTest(point.x, point.y) as HitTestResult<LineToolHitTestData> | null;
+		return this._renderer.hitTest(point.x, point.y, ctx) as HitTestResult<LineToolHitTestData> | null;
 	}
 
 	protected _lineAnchorColors(points: AnchorPoint[]): string[] {
@@ -250,5 +258,36 @@ export abstract class LineToolPaneView implements IPaneView, IInputEventListener
 	protected _getLineAnchorRenderer(index: number): LineAnchorRenderer {
 		for (; this._lineAnchorRenderers.length <= index;) {this._lineAnchorRenderers.push(new LineAnchorRenderer());}
 		return this._lineAnchorRenderers[index];
+	}
+
+	protected _tryApplyLineToolShift(appliedPoint: Point, event: TouchMouseEvent, useEditedPointIndex: boolean): void {
+		const isTrendLine = this._isTrendLine();
+
+		// if shift, isTrendLine = true and at least 1 point exists already
+		if (event.shiftKey === true && isTrendLine === true && this._points.length > 0) {
+			// override point
+			if (useEditedPointIndex) {
+				if (this._editedPointIndex === 1) {
+					appliedPoint.y = this._points[0].y;
+				} else if (this._editedPointIndex === 0) {
+					appliedPoint.y = this._points[1].y;
+				}
+			} else {
+				// if shift, isTrendLine = true and at least 1 point exists already
+				if (event.shiftKey === true && isTrendLine === true && this._points.length > 0) {
+					// override point 2's y with point 1's y
+					appliedPoint.y = this._points[0].y;
+				}
+			}
+		}
+	}
+
+	protected _isTrendLine(): boolean {
+		let isTrendLine = false;
+		const toolTypeStr = String(this._source.toolType());
+		if (toolTypeStr === 'TrendLine' || toolTypeStr === 'Ray' || toolTypeStr === 'Arrow' || toolTypeStr === 'ExtendedLine') {
+			isTrendLine = true;
+		}
+		return isTrendLine;
 	}
 }

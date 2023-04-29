@@ -50,7 +50,7 @@ export class TrendLinePaneView extends LineToolPaneView {
 				const start = point0.x < point1.x ? point0 : point1;
 				const end = start === point0 ? point1 : point0;
 
-				const angle = Math.atan((end.y - start.y) / (end.x - start.x));
+				const angle = Math.atan((end.y - start.y) / (end.x - start.x)) / Math.PI * -180;
 				const align = options.text.box.alignment.horizontal;
 				const pivot = align === BoxHorizontalAlignment.Left
 					? start.clone() : align === BoxHorizontalAlignment.Right

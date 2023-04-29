@@ -62,7 +62,7 @@ export class PolygonRenderer extends ScaledRenderer {
 
 	// eslint-disable-next-line complexity
 	protected _drawImpl(ctx: CanvasRenderingContext2D, isHovered: boolean, hitTestData?: unknown): void {
-		if (this._data === null || !this._data.points) { return; }
+		if (this._data === null || !this._data.points || !this._data.points.length) { return; }
 
 		const pointsCount = this._data.points.length;
 		const lineStyle = this._data.line.style || LineStyle.Solid;

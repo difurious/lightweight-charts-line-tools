@@ -354,6 +354,11 @@ export interface FibRetracementLevel {
 	 * Level color.
 	 */
 	color: string;
+
+    /**
+     * Opacity of the background.
+     */
+	opacity: number;
 }
 
 export interface LineToolOptionsCommon {
