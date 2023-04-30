@@ -136,12 +136,8 @@ export abstract class LineToolPaneView implements IUpdatablePaneView, IInputEven
 		// finised editing or creating a line tool, execute AfterEdit event
 		const selectedLineTools = paneWidget.state().getSelectedLineTools();
 		if (selectedLineTools.length > 0) {
-			console.log('firing fireLineToolsAfterEdit');
-			// const lineTool = selectedLineTools[0];
-
 			// create a new lineToolExport to make sure that any change in the lineTool exported in not immediately applied.
 			const selectedLineTool = clone(selectedLineTools[0].exportLineToolToLineToolExport());
-			console.log(selectedLineTool);
 			this._model.fireLineToolsAfterEdit(selectedLineTool, stage);
 		}
 	}
@@ -152,12 +148,10 @@ export abstract class LineToolPaneView implements IUpdatablePaneView, IInputEven
 
 			// did a line tool just finish being created, if so fire AfterEdit
 			if (!this._source.editing() && !this._source.creating()) {
-				console.log('finished creating a line tool');
 				// finished creating a line tool, fire after edit event
 				this.getSelectedAndFireAfterEdit(paneWidget, 'lineToolFinished');
 			} else if (this._source.finished()) {
 				// this will detect if a path is finished being created
-				console.log('finished creating a path, a line tool');
 				this.getSelectedAndFireAfterEdit(paneWidget, 'pathFinished');
 			}
 		} else if (this._source.editing()) {
@@ -168,7 +162,6 @@ export abstract class LineToolPaneView implements IUpdatablePaneView, IInputEven
 			this._editedPointIndex = null;
 			this._source.setEditing(false);
 			this._source.setCreating(false);
-			console.log('onMouseUp and done editing a line tool');
 
 			// finished editing an existing line tool, fire after edit event
 			this.getSelectedAndFireAfterEdit(paneWidget, 'lineToolEdited');
