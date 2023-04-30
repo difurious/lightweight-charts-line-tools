@@ -10,4 +10,6 @@ export const priceLineOptionsDefaults: PriceLineOptions = {
 	axisLabelVisible: true,
 	title: '',
 	draggable: false,
+	ray: false,
+	rayStart: 0,
 };

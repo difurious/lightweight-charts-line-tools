@@ -52,4 +52,16 @@ export interface PriceLineOptions {
 	 * @defaultValue `false`
 	 */
 	draggable: boolean;
+	/**
+	 * Whether the price line is a ray.
+	 *
+	 * @defaultValue `false`
+	 */
+	ray: boolean;
+	/**
+	 * Ray start date as a number.
+	 *
+	 * @defaultValue `0`
+	 */
+	rayStart: number;
 }

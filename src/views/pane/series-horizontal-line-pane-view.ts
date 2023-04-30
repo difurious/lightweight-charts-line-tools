@@ -16,6 +16,8 @@ export abstract class SeriesHorizontalLinePaneView implements IPaneView {
 		lineWidth: 1,
 		lineStyle: LineStyle.Solid,
 		visible: false,
+		ray: false,
+		rayStart: 0 as Coordinate,
 	};
 
 	protected readonly _series: Series;
