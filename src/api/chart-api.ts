@@ -1,4 +1,4 @@
-import { ChartWidget, CustomPriceLineDraggedEventParamsImpl, CustomPriceLineDraggedEventParamsImplSupplier, LineToolsDoubleClickEventParamsImpl, LineToolsDoubleClickEventParamsImplSupplier, MouseEventParamsImpl, MouseEventParamsImplSupplier } from '../gui/chart-widget';
+import { ChartWidget, CustomPriceLineDraggedEventParamsImpl, CustomPriceLineDraggedEventParamsImplSupplier, LineToolsAfterEditEventParamsImpl, LineToolsAfterEditEventParamsImplSupplier, LineToolsDoubleClickEventParamsImpl, LineToolsDoubleClickEventParamsImplSupplier, MouseEventParamsImpl, MouseEventParamsImplSupplier } from '../gui/chart-widget';
 
 import { ensureDefined } from '../helpers/assertions';
 import { Delegate } from '../helpers/delegate';
@@ -35,7 +35,7 @@ import {
 import { CandlestickSeriesApi } from './candlestick-series-api';
 import { DataUpdatesConsumer, SeriesDataItemTypeMap } from './data-consumer';
 import { DataLayer, DataUpdateResponse, SeriesChanges } from './data-layer';
-import { CustomPriceLineDraggedEventHandler, CustomPriceLineDraggedEventParams, IChartApi, LineToolsDoubleClickEventHandler, LineToolsDoubleClickEventParams, MouseEventHandler, MouseEventParams } from './ichart-api';
+import { CustomPriceLineDraggedEventHandler, CustomPriceLineDraggedEventParams, IChartApi, LineToolsAfterEditEventHandler, LineToolsAfterEditEventParams, LineToolsDoubleClickEventHandler, LineToolsDoubleClickEventParams, MouseEventHandler, MouseEventParams } from './ichart-api';
 import { IPriceScaleApi } from './iprice-scale-api';
 import { ISeriesApi } from './iseries-api';
 import { ITimeScaleApi } from './itime-scale-api';
@@ -166,6 +166,7 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 	private readonly _crosshairMovedDelegate: Delegate<MouseEventParams> = new Delegate();
 	private readonly _customPriceLineDraggedDelegate: Delegate<CustomPriceLineDraggedEventParams> = new Delegate();
 	private readonly _lineToolsDoubleClickDelegate: Delegate<LineToolsDoubleClickEventParams> = new Delegate();
+	private readonly _lineToolsAfterEditDelegate: Delegate<LineToolsAfterEditEventParams> = new Delegate();
 
 	private readonly _timeScaleApi: TimeScaleApi;
 
@@ -211,6 +212,15 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 			this
 		);
 
+		this._chartWidget.lineToolsAfterEdit().subscribe(
+			(paramSupplier: LineToolsAfterEditEventParamsImplSupplier) => {
+				if (this._lineToolsAfterEditDelegate.hasListeners()) {
+					this._lineToolsAfterEditDelegate.fire(this._convertLineToolsAfterEditParams(paramSupplier()));
+				}
+			},
+			this
+		);
+
 		const model = this._chartWidget.model();
 		this._timeScaleApi = new TimeScaleApi(model, this._chartWidget.timeAxisWidget());
 	}
@@ -220,6 +230,7 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		this._chartWidget.crosshairMoved().unsubscribeAll(this);
 		this._chartWidget.customPriceLineDragged().unsubscribeAll(this);
 		this._chartWidget.lineToolsDoubleClick().unsubscribeAll(this);
+		this._chartWidget.lineToolsAfterEdit().unsubscribeAll(this);
 
 		this._timeScaleApi.destroy();
 		this._chartWidget.destroy();
@@ -231,6 +242,7 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		this._crosshairMovedDelegate.destroy();
 		this._customPriceLineDraggedDelegate.destroy();
 		this._lineToolsDoubleClickDelegate.destroy();
+		this._lineToolsAfterEditDelegate.destroy();
 		this._dataLayer.destroy();
 	}
 
@@ -456,6 +468,14 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		this._lineToolsDoubleClickDelegate.unsubscribe(handler);
 	}
 
+	public subscribeLineToolsAfterEdit(handler: LineToolsAfterEditEventHandler): void {
+		this._lineToolsAfterEditDelegate.subscribe(handler);
+	}
+
+	public unsubscribeLineToolsAfterEdit(handler: LineToolsAfterEditEventHandler): void {
+		this._lineToolsAfterEditDelegate.unsubscribe(handler);
+	}
+
 	public priceScale(priceScaleId?: string): IPriceScaleApi {
 		if (priceScaleId === undefined) {
 			warn('Using ChartApi.priceScale() method without arguments has been deprecated, pass valid price scale id instead');
@@ -525,6 +545,13 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 	private _convertLineToolsDoubleClickParams(param: LineToolsDoubleClickEventParamsImpl): LineToolsDoubleClickEventParams {
 		return {
 			selectedLineTool: param.selectedLineTool,
+		};
+	}
+
+	private _convertLineToolsAfterEditParams(param: LineToolsAfterEditEventParamsImpl): LineToolsAfterEditEventParams {
+		return {
+			selectedLineTool: param.selectedLineTool,
+			stage: param.stage,
 		};
 	}
 }

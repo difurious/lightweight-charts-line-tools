@@ -349,6 +349,7 @@ export class ChartModel implements IDestroyable {
 	private _crosshairMoved: Delegate<TimePointIndex | null, Point | null> = new Delegate();
 	private _customPriceLineDragged: Delegate<CustomPriceLine, string> = new Delegate();
 	private _lineToolsDoubleClick: Delegate<LineToolExport<LineToolType>> = new Delegate();
+	private _lineToolsAfterEdit: Delegate<LineToolExport<LineToolType>, string> = new Delegate();
 
 	private _backgroundTopColor: string;
 	private _backgroundBottomColor: string;
@@ -520,6 +521,10 @@ export class ChartModel implements IDestroyable {
 
 	public lineToolsDoubleClick(): ISubscription<LineToolExport<LineToolType>> {
 		return this._lineToolsDoubleClick;
+	}
+
+	public lineToolsAfterEdit(): ISubscription<LineToolExport<LineToolType>, string> {
+		return this._lineToolsAfterEdit;
 	}
 
 	public setPaneHeight(pane: Pane, height: number): void {
@@ -768,6 +773,10 @@ export class ChartModel implements IDestroyable {
 
 	public fireLineToolsDoubleClick(selectedLineTools: LineToolExport<LineToolType>): void {
 		this._lineToolsDoubleClick.fire(selectedLineTools);
+	}
+
+	public fireLineToolsAfterEdit(selectedLineTools: LineToolExport<LineToolType>, stage: string): void {
+		this._lineToolsAfterEdit.fire(selectedLineTools, stage);
 	}
 
 	public destroy(): void {

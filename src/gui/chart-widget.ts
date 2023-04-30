@@ -48,7 +48,14 @@ export interface LineToolsDoubleClickEventParamsImpl {
 	selectedLineTool: LineToolExport<LineToolType>;
 }
 
+export interface LineToolsAfterEditEventParamsImpl {
+	selectedLineTool: LineToolExport<LineToolType>;
+	stage: string;
+}
+
 export type LineToolsDoubleClickEventParamsImplSupplier = () => LineToolsDoubleClickEventParamsImpl;
+
+export type LineToolsAfterEditEventParamsImplSupplier = () => LineToolsAfterEditEventParamsImpl;
 
 export class ChartWidget implements IDestroyable {
 	private readonly _options: ChartOptionsInternal;
@@ -69,6 +76,7 @@ export class ChartWidget implements IDestroyable {
 	private _crosshairMoved: Delegate<MouseEventParamsImplSupplier> = new Delegate();
 	private _customPriceLineDragged: Delegate<CustomPriceLineDraggedEventParamsImplSupplier> = new Delegate();
 	private _lineToolsDoubleClick: Delegate<LineToolsDoubleClickEventParamsImplSupplier> = new Delegate();
+	private _lineToolsAfterEdit: Delegate<LineToolsAfterEditEventParamsImplSupplier> = new Delegate();
 	private _onWheelBound: (event: WheelEvent) => void;
 
 	public constructor(container: HTMLElement, options: ChartOptionsInternal) {
@@ -95,6 +103,7 @@ export class ChartWidget implements IDestroyable {
 		this.model().crosshairMoved().subscribe(this._onPaneWidgetCrosshairMoved.bind(this), this);
 		this.model().customPriceLineDragged().subscribe(this._onCustomPriceLineDragged.bind(this), this);
 		this.model().lineToolsDoubleClick().subscribe(this._onLineToolsDoubleClick.bind(this), this);
+		this.model().lineToolsAfterEdit().subscribe(this._onLineToolsAfterEdit.bind(this), this);
 
 		this._timeAxisWidget = new TimeAxisWidget(this);
 		this._tableElement.appendChild(this._timeAxisWidget.getElement());
@@ -247,6 +256,10 @@ export class ChartWidget implements IDestroyable {
 
 	public lineToolsDoubleClick(): ISubscription<LineToolsDoubleClickEventParamsImplSupplier> {
 		return this._lineToolsDoubleClick;
+	}
+
+	public lineToolsAfterEdit(): ISubscription<LineToolsAfterEditEventParamsImplSupplier> {
+		return this._lineToolsAfterEdit;
 	}
 
 	public takeScreenshot(): HTMLCanvasElement {
@@ -688,6 +701,13 @@ export class ChartWidget implements IDestroyable {
 		};
 	}
 
+	private _getLineToolsAfterEditEventParamsImpl(selectedLineTool: LineToolExport<LineToolType>, stage: string): LineToolsAfterEditEventParamsImpl {
+		return {
+			selectedLineTool: selectedLineTool,
+			stage: stage,
+		};
+	}
+
 	private _onPaneWidgetClicked(time: TimePointIndex | null, point: Point): void {
 		this._clicked.fire(() => this._getMouseEventParamsImpl(time, point));
 	}
@@ -702,6 +722,10 @@ export class ChartWidget implements IDestroyable {
 
 	private _onLineToolsDoubleClick(selectedLineTool: LineToolExport<LineToolType>): void {
 		this._lineToolsDoubleClick.fire(() => this._getLineToolsDoubleClickEventParamsImpl(selectedLineTool));
+	}
+
+	private _onLineToolsAfterEdit(selectedLineTool: LineToolExport<LineToolType>, stage: string): void {
+		this._lineToolsAfterEdit.fire(() => this._getLineToolsAfterEditEventParamsImpl(selectedLineTool, stage));
 	}
 
 	private _updateTimeAxisVisibility(): void {

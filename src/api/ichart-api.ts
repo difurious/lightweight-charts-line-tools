@@ -73,7 +73,14 @@ export interface LineToolsDoubleClickEventParams {
 	selectedLineTool: LineToolExport<LineToolType>;
 }
 
+export interface LineToolsAfterEditEventParams {
+	selectedLineTool: LineToolExport<LineToolType>;
+	stage: string;
+}
+
 export type LineToolsDoubleClickEventHandler = (param: LineToolsDoubleClickEventParams) => void;
+
+export type LineToolsAfterEditEventHandler = (param: LineToolsAfterEditEventParams) => void;
 
 /**
  * The main interface of a single chart.
@@ -297,6 +304,20 @@ export interface IChartApi {
 	 * @param handler - previously subscribed handler
 	 */
 	unsubscribeLineToolsDoubleClick(handler: LineToolsDoubleClickEventHandler): void;
+
+	/**
+	 * Adds a subscription to receive notifications on linetools after finishing editing a line tool
+	 *
+	 * @param handler - handler (function) to be called after line tool was finished editing
+	 */
+	subscribeLineToolsAfterEdit(handler: LineToolsAfterEditEventHandler): void;
+
+	/**
+	 * Removes linetools notifications on linetools after finishing editing a line tool
+	 *
+	 * @param handler - previously subscribed handler
+	 */
+	unsubscribeLineToolsAfterEdit(handler: LineToolsAfterEditEventHandler): void;
 
 	/**
 	 * Returns API to manipulate a price scale.
