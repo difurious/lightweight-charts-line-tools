@@ -35,6 +35,7 @@ export enum PaneCursorType {
 	HorizontalResize = 'e-resize',
 	DiagonalNeSwResize = 'nesw-resize',
 	DiagonalNwSeResize = 'nwse-resize',
+	NotAllowed = 'not-allowed',
 }
 
 export class Pane implements IDestroyable {

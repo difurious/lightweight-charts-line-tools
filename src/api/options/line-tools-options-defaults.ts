@@ -20,6 +20,7 @@ export const TextDefaults: TextOptions = {
 
 export const TrendLineOptionDefaults: TrendLineToolOptions = {
 	visible: true,
+	editable: true,
 	line: {
 		width: 1,
 		color: '#2962ff',
@@ -32,6 +33,7 @@ export const TrendLineOptionDefaults: TrendLineToolOptions = {
 
 export const HorizontalLineOptionDefaults: HorizontalLineToolOptions = {
 	visible: true,
+	editable: true,
 	line: {
 		width: 1,
 		color: '#2962ff',
@@ -44,6 +46,7 @@ export const HorizontalLineOptionDefaults: HorizontalLineToolOptions = {
 
 export const ParallelChannelOptionDefaults: ParallelChannelToolOptions = {
 	visible: true,
+	editable: true,
 	showMiddleLine: true,
 	extend: { left: false, right: false },
 	background: { color: applyAlpha('#2962ff', 0.2) },
@@ -53,6 +56,7 @@ export const ParallelChannelOptionDefaults: ParallelChannelToolOptions = {
 
 export const FibRetracementOptionDefaults: FibRetracementToolOptions = {
 	visible: true,
+	editable: true,
 	extend: { left: false, right: false },
 	line: { width: 1, style: LineStyle.Solid },
 	levels: [
@@ -72,6 +76,7 @@ export const FibRetracementOptionDefaults: FibRetracementToolOptions = {
 
 export const BrushOptionDefaults: BrushToolOptions = {
 	visible: true,
+	editable: true,
 	line: {
 		width: 1,
 		color: '#00bcd4',
@@ -83,6 +88,7 @@ export const BrushOptionDefaults: BrushToolOptions = {
 
 export const RectangleOptionDefaults: RectangleToolOptions = {
 	visible: true,
+	editable: true,
 	rectangle: {
 		extend: { left: false, right: false },
 		background: { color: applyAlpha('#9c27b0', 0.2) },
@@ -93,6 +99,7 @@ export const RectangleOptionDefaults: RectangleToolOptions = {
 
 export const TriangleOptionDefaults: TriangleToolOptions = {
 	visible: true,
+	editable: true,
 	triangle: {
 		background: { color: applyAlpha('#f57c00', 0.2) },
 		border: { width: 1, style: LineStyle.Solid, color: '#f57c00' },
@@ -101,12 +108,14 @@ export const TriangleOptionDefaults: TriangleToolOptions = {
 
 export const VerticalLineOptionDefaults: VerticalLineToolOptions = {
 	visible: true,
+	editable: true,
 	text: TextDefaults,
 	line: { width: 1, color: '#2962ff', style: LineStyle.Solid },
 };
 
 export const PathOptionDefaults: PathToolOptions = {
 	visible: true,
+	editable: true,
 	line: {
 		width: 1,
 		color: '#2962ff',
@@ -117,16 +126,19 @@ export const PathOptionDefaults: PathToolOptions = {
 
 export const CrossLineOptionDefaults: CrossLineToolOptions = {
 	visible: true,
+	editable: true,
 	line: { width: 1, color: '#2962ff', style: LineStyle.Solid },
 };
 
 export const HighlighterOptionDefaults: HighlighterToolOptions = {
 	visible: true,
+	editable: true,
 	line: { color: applyAlpha('#f23645', 0.15) },
 };
 
 export const TextOptionDefaults: TextToolOptions = {
 	visible: true,
+	editable: true,
 	text: merge(clone(TextDefaults), { value: 'Text' }) as TextOptions,
 };
 

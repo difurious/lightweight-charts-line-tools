@@ -11,6 +11,7 @@ export class LineToolHighlighter extends LineToolBrush {
 		const options = this.options();
 		return {
 			visible: options.visible,
+			editable: options.editable,
 			line: {
 				width: 20 as LineWidth,
 				cap: LineCap.Round,

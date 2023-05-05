@@ -223,8 +223,12 @@ export abstract class LineToolPaneView implements IUpdatablePaneView, IInputEven
 			const changed = this._source.setHovered(hitResult !== null && !event.consumed);
 
 			if (this._source.hovered() && !event.consumed) {
-				paneWidget.setCursor(hitResult?.data()?.cursorType || PaneCursorType.Pointer);
-				this._editedPointIndex = hitResult?.data()?.pointIndex ?? null;
+				if (this._source.options().editable === true) {
+					paneWidget.setCursor(hitResult?.data()?.cursorType || PaneCursorType.Pointer);
+					this._editedPointIndex = hitResult?.data()?.pointIndex ?? null;
+				} else {
+					paneWidget.setCursor(hitResult?.data()?.cursorType || PaneCursorType.NotAllowed);
+				}
 			}
 
 			return changed;
@@ -240,8 +244,12 @@ export abstract class LineToolPaneView implements IUpdatablePaneView, IInputEven
 			this._source.addPoint(this._source.screenPointToPoint(appliedPoint) as LineToolPoint);
 			return false;
 		} else {
-			const hitResult = this._hitTest(paneWidget, ctx, originPoint);
-			return this._source.setSelected(hitResult !== null && !event.consumed);
+			if (this._source.options().editable === true) {
+				const hitResult = this._hitTest(paneWidget, ctx, originPoint);
+				return this._source.setSelected(hitResult !== null && !event.consumed);
+			} else {
+				return false;
+			}
 		}
 	}
 

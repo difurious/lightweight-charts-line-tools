@@ -370,6 +370,13 @@ export interface LineToolOptionsCommon {
 	visible: boolean;
 
 	/**
+	 * Can the line be edited.
+	 *
+	 * @defaultValue `true`
+	 */
+	editable: boolean;
+
+	/**
 	 * The owner source id.
 	 */
 	ownerSourceId?: string;
