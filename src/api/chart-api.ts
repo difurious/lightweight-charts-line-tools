@@ -367,6 +367,22 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		this._chartWidget.model().lineToolCreator().setActiveLineTool(name, options);
 	}
 
+	public removeLineToolsById(ids: string[]): void {
+		if (Array.isArray(ids)) {
+			const pane = this._getPane();
+			if (pane === null) { return; }
+			ids.forEach((id: string) => {
+				const lineToolToRemove = pane.getLineTool(id);
+				if (lineToolToRemove === null) {
+					return;
+				}
+				pane.removeDataSource(lineToolToRemove);
+			});
+			pane.recalculate();
+		}
+		return;
+	}
+
 	public removeSelectedLineTools(): void {
 		const pane = this._getPane();
 		if (pane === null) { return; }

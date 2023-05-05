@@ -183,6 +183,11 @@ export interface IChartApi {
 	setActiveLineTool<T extends LineToolType>(name: T, options: LineToolPartialOptionsMap[T]): void;
 
 	/**
+     * Remove a LineTool by its ID.
+     */
+	removeLineToolsById(ids: string[]): void;
+
+	/**
      * Remove the currently selected LineTool only.
      */
 	removeSelectedLineTools(): void;
