@@ -383,6 +383,17 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		return;
 	}
 
+	public getSelectedLineTools(): string {
+		let lineToolsOptions: LineToolExport<LineToolType>[] = [];
+		const pane = this._getPane();
+		if (pane === null) { return JSON.stringify(lineToolsOptions); }
+		const selectedLineTools = pane.getSelectedLineTools();
+		if (selectedLineTools.length > 0) {
+			lineToolsOptions = selectedLineTools.map((l: LineTool<LineToolType>) => l.exportLineToolToLineToolExport());
+		}
+		return JSON.stringify(lineToolsOptions);
+	}
+
 	public removeSelectedLineTools(): void {
 		const pane = this._getPane();
 		if (pane === null) { return; }

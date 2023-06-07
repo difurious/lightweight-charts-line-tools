@@ -188,6 +188,11 @@ export interface IChartApi {
 	removeLineToolsById(ids: string[]): void;
 
 	/**
+     * Get the currently selected LineTool(s), return JSON string of them.
+     */
+	getSelectedLineTools(): void;
+
+	/**
      * Remove the currently selected LineTool only.
      */
 	removeSelectedLineTools(): void;
