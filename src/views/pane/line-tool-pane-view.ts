@@ -132,12 +132,14 @@ export abstract class LineToolPaneView implements IUpdatablePaneView, IInputEven
 		return renderer;
 	}
 
-	public getSelectedAndFireAfterEdit(paneWidget: PaneWidget, stage: string): void {
+	public getSelectedAndFireAfterEdit(paneWidget: PaneWidget, stage: string, orderID: string): void {
 		// finised editing or creating a line tool, execute AfterEdit event
-		const selectedLineTools = paneWidget.state().getSelectedLineTools();
-		if (selectedLineTools.length > 0) {
+		// get the specific lineTool that was pathFinished, lineToolFinished, lineToolEdited and pass it on to the front end
+		const modifiedLineTool = paneWidget.state().getLineTool(orderID);
+		// if not null, the id exists, so pass it to frontend
+		if (modifiedLineTool !== null) {
 			// create a new lineToolExport to make sure that any change in the lineTool exported in not immediately applied.
-			const selectedLineTool = clone(selectedLineTools[0].exportLineToolToLineToolExport());
+			const selectedLineTool = clone(modifiedLineTool.exportLineToolToLineToolExport());
 			this._model.fireLineToolsAfterEdit(selectedLineTool, stage);
 		}
 	}
@@ -146,13 +148,15 @@ export abstract class LineToolPaneView implements IUpdatablePaneView, IInputEven
 		if (!this._source.finished()) {
 			this._source.tryFinish();
 
+			const orderID = this._source.id();
+
 			// did a line tool just finish being created, if so fire AfterEdit
 			if (!this._source.editing() && !this._source.creating()) {
 				// finished creating a line tool, fire after edit event
-				this.getSelectedAndFireAfterEdit(paneWidget, 'lineToolFinished');
+				this.getSelectedAndFireAfterEdit(paneWidget, 'lineToolFinished', orderID);
 			} else if (this._source.finished()) {
 				// this will detect if a path is finished being created
-				this.getSelectedAndFireAfterEdit(paneWidget, 'pathFinished');
+				this.getSelectedAndFireAfterEdit(paneWidget, 'pathFinished', orderID);
 			}
 		} else if (this._source.editing()) {
 			this._model.magnet().disable();
@@ -163,8 +167,11 @@ export abstract class LineToolPaneView implements IUpdatablePaneView, IInputEven
 			this._source.setEditing(false);
 			this._source.setCreating(false);
 
+			// pass along the id of the lineTool
+			const orderID = this._source.id();
+
 			// finished editing an existing line tool, fire after edit event
-			this.getSelectedAndFireAfterEdit(paneWidget, 'lineToolEdited');
+			this.getSelectedAndFireAfterEdit(paneWidget, 'lineToolEdited', orderID);
 
 			return true;
 		}
