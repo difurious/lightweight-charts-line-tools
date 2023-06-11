@@ -9,7 +9,7 @@ import { Series } from './series';
 import { TimePointIndex } from './time-data';
 
 export class Magnet {
-	private _enabled: boolean = false;
+	private _enabled: boolean = true;
 	private readonly _options: CrosshairOptions;
 
 	public constructor(options: CrosshairOptions) {
@@ -78,7 +78,7 @@ export class Magnet {
 		candidates.sort((y1: Coordinate, y2: Coordinate) => Math.abs(y1 - y) - Math.abs(y2 - y));
 
 		const nearest = candidates[0];
-		//res = defaultPriceScale.coordinateToPrice(nearest, firstValue);
+		// res = defaultPriceScale.coordinateToPrice(nearest, firstValue);
 		if (Math.abs(nearest - y) < this._options.magnetThreshold) {
 			res = defaultPriceScale.coordinateToPrice(nearest, firstValue);
 		}
