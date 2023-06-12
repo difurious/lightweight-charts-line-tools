@@ -8,7 +8,6 @@ import { DeepPartial } from '../helpers/strict-type-checks';
 import { BarPrice, BarPrices } from '../model/bar';
 import { ChartModel, ChartOptionsInternal } from '../model/chart-model';
 import { Coordinate } from '../model/coordinate';
-import { CustomPriceLine } from '../model/custom-price-line';
 import {
 	InvalidateMask,
 	InvalidationLevel,
@@ -36,13 +35,6 @@ export interface MouseEventParamsImpl {
 }
 
 export type MouseEventParamsImplSupplier = () => MouseEventParamsImpl;
-
-export interface CustomPriceLineDraggedEventParamsImpl {
-	customPriceLine: CustomPriceLine;
-	fromPriceString: string;
-}
-
-export type CustomPriceLineDraggedEventParamsImplSupplier = () => CustomPriceLineDraggedEventParamsImpl;
 
 export interface LineToolsDoubleClickEventParamsImpl {
 	selectedLineTool: LineToolExport<LineToolType>;
@@ -74,7 +66,6 @@ export class ChartWidget implements IDestroyable {
 	private _drawPlanned: boolean = false;
 	private _clicked: Delegate<MouseEventParamsImplSupplier> = new Delegate();
 	private _crosshairMoved: Delegate<MouseEventParamsImplSupplier> = new Delegate();
-	private _customPriceLineDragged: Delegate<CustomPriceLineDraggedEventParamsImplSupplier> = new Delegate();
 	private _lineToolsDoubleClick: Delegate<LineToolsDoubleClickEventParamsImplSupplier> = new Delegate();
 	private _lineToolsAfterEdit: Delegate<LineToolsAfterEditEventParamsImplSupplier> = new Delegate();
 	private _onWheelBound: (event: WheelEvent) => void;
@@ -101,7 +92,6 @@ export class ChartWidget implements IDestroyable {
 			this._options
 		);
 		this.model().crosshairMoved().subscribe(this._onPaneWidgetCrosshairMoved.bind(this), this);
-		this.model().customPriceLineDragged().subscribe(this._onCustomPriceLineDragged.bind(this), this);
 		this.model().lineToolsDoubleClick().subscribe(this._onLineToolsDoubleClick.bind(this), this);
 		this.model().lineToolsAfterEdit().subscribe(this._onLineToolsAfterEdit.bind(this), this);
 
@@ -163,7 +153,6 @@ export class ChartWidget implements IDestroyable {
 		}
 
 		this._model.crosshairMoved().unsubscribeAll(this);
-		this._model.customPriceLineDragged().unsubscribeAll(this);
 		this._model.lineToolsDoubleClick().unsubscribeAll(this);
 		this._model.timeScale().optionsApplied().unsubscribeAll(this);
 		this._model.priceScalesOptionsChanged().unsubscribeAll(this);
@@ -248,10 +237,6 @@ export class ChartWidget implements IDestroyable {
 
 	public crosshairMoved(): ISubscription<MouseEventParamsImplSupplier> {
 		return this._crosshairMoved;
-	}
-
-	public customPriceLineDragged(): ISubscription<CustomPriceLineDraggedEventParamsImplSupplier> {
-		return this._customPriceLineDragged;
 	}
 
 	public lineToolsDoubleClick(): ISubscription<LineToolsDoubleClickEventParamsImplSupplier> {
@@ -688,13 +673,6 @@ export class ChartWidget implements IDestroyable {
 		};
 	}
 
-	private _getCustomPriceLineDraggedEventParamsImpl(customPriceLine: CustomPriceLine, fromPriceString: string): CustomPriceLineDraggedEventParamsImpl {
-		return {
-			customPriceLine: customPriceLine,
-			fromPriceString: fromPriceString,
-		};
-	}
-
 	private _getLineToolsDoubleClickEventParamsImpl(selectedLineTool: LineToolExport<LineToolType>): LineToolsDoubleClickEventParamsImpl {
 		return {
 			selectedLineTool: selectedLineTool,
@@ -714,10 +692,6 @@ export class ChartWidget implements IDestroyable {
 
 	private _onPaneWidgetCrosshairMoved(time: TimePointIndex | null, point: Point | null): void {
 		this._crosshairMoved.fire(() => this._getMouseEventParamsImpl(time, point));
-	}
-
-	private _onCustomPriceLineDragged(customPriceLine: CustomPriceLine, fromPriceString: string): void {
-		this._customPriceLineDragged.fire(() => this._getCustomPriceLineDraggedEventParamsImpl(customPriceLine, fromPriceString));
 	}
 
 	private _onLineToolsDoubleClick(selectedLineTool: LineToolExport<LineToolType>): void {

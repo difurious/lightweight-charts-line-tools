@@ -12,7 +12,6 @@ import { PriceAxisRendererOptionsProvider } from '../renderers/price-axis-render
 
 import { Coordinate } from './coordinate';
 import { Crosshair, CrosshairOptions } from './crosshair';
-import { CustomPriceLine } from './custom-price-line';
 import { DefaultPriceScaleId, isDefaultPriceScale } from './default-price-scale';
 import { GridOptions } from './grid';
 import { InvalidateMask, InvalidationLevel } from './invalidate-mask';
@@ -347,7 +346,6 @@ export class ChartModel implements IDestroyable {
 	private _hoveredSource: HoveredSource | null = null;
 	private readonly _priceScalesOptionsChanged: Delegate = new Delegate();
 	private _crosshairMoved: Delegate<TimePointIndex | null, Point | null> = new Delegate();
-	private _customPriceLineDragged: Delegate<CustomPriceLine, string> = new Delegate();
 	private _lineToolsDoubleClick: Delegate<LineToolExport<LineToolType>> = new Delegate();
 	private _lineToolsAfterEdit: Delegate<LineToolExport<LineToolType>, string> = new Delegate();
 
@@ -513,10 +511,6 @@ export class ChartModel implements IDestroyable {
 
 	public crosshairMoved(): ISubscription<TimePointIndex | null, Point | null> {
 		return this._crosshairMoved;
-	}
-
-	public customPriceLineDragged(): ISubscription<CustomPriceLine, string> {
-		return this._customPriceLineDragged;
 	}
 
 	public lineToolsDoubleClick(): ISubscription<LineToolExport<LineToolType>> {
@@ -789,10 +783,6 @@ export class ChartModel implements IDestroyable {
 		this._watermark.updateAllViews();
 		this._panes.forEach((p: Pane) => p.recalculate());
 		this.updateCrosshair();
-	}
-
-	public fireCustomPriceLineDragged(customPriceLine: CustomPriceLine, fromPriceString: string): void {
-		this._customPriceLineDragged.fire(customPriceLine, fromPriceString);
 	}
 
 	public fireLineToolsDoubleClick(selectedLineTools: LineToolExport<LineToolType>): void {

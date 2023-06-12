@@ -2,7 +2,6 @@ import { DeepPartial } from '../helpers/strict-type-checks';
 
 import { BarPrice, BarPrices } from '../model/bar';
 import { ChartOptions } from '../model/chart-model';
-import { CustomPriceLine } from '../model/custom-price-line';
 import { LineToolExport, LineToolPoint } from '../model/line-tool';
 import { LineToolPartialOptionsMap, LineToolType } from '../model/line-tool-options';
 import { Point } from '../model/point';
@@ -61,13 +60,6 @@ export interface MouseEventParams {
  * A custom function use to handle mouse events.
  */
 export type MouseEventHandler = (param: MouseEventParams) => void;
-
-export interface CustomPriceLineDraggedEventParams {
-	customPriceLine: CustomPriceLine;
-	fromPriceString: string;
-}
-
-export type CustomPriceLineDraggedEventHandler = (param: CustomPriceLineDraggedEventParams) => void;
 
 export interface LineToolsDoubleClickEventParams {
 	selectedLineTool: LineToolExport<LineToolType>;
@@ -290,20 +282,6 @@ export interface IChartApi {
 	 * ```
 	 */
 	unsubscribeCrosshairMove(handler: MouseEventHandler): void;
-
-	/**
-	 * Adds a subscription to receive notifications on custom price lines being dragged
-	 *
-	 * @param handler - handler (function) to be called on dragged
-	 */
-	subscribeCustomPriceLineDragged(handler: CustomPriceLineDraggedEventHandler): void;
-
-	/**
-	 * Removes custom price line dragged subscription
-	 *
-	 * @param handler - previously subscribed handler
-	 */
-	unsubscribeCustomPriceLineDragged(handler: CustomPriceLineDraggedEventHandler): void;
 
 	/**
 	 * Adds a subscription to receive notifications on linetools being double clicked

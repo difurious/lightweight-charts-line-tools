@@ -47,12 +47,6 @@ export interface PriceLineOptions {
 	 */
 	title: string;
 	/**
-	 * Whether the price line can be dragged.
-	 *
-	 * @defaultValue `false`
-	 */
-	draggable: boolean;
-	/**
 	 * Whether the price line is a ray.
 	 *
 	 * @defaultValue `false`
