@@ -105,3 +105,46 @@ As thanks for creating this product, we'd be grateful if you add it in a promine
 [bundle-size-img]: https://badgen.net/bundlephobia/minzip/lightweight-charts
 [deps-count-img]: https://img.shields.io/badge/dynamic/json.svg?label=dependecies&color=brightgreen&query=$.dependencyCount&uri=https%3A%2F%2Fbundlephobia.com%2Fapi%2Fsize%3Fpackage%3Dlightweight-charts
 [bundle-size-link]: https://bundlephobia.com/result?p=lightweight-charts
+
+<br>
+
+# Line Tools
+## Acknowledgments
+
+<br>Sync crosshairs, and draggable was from [randalhsu](https://github.com/randalhsu/OPAL/tree/main/lightweight-charts-patch)
+<br>Initial rough code of line tools was from [iosiftalmacel](https://github.com/iosiftalmacel/)
+<br>Merge of iosiftalmacel's line tools to lightweight-charts 3.8.0 was done by Discord user **shinobaki**
+<br>Other line tools addition done by Discord user **difurious**
+
+## Main Features
+1. **[Crosshair Sync](#crosshair-sync)**
+2. **createPriceLine added ability to make a ray**  (draggable createPriceLine was removed from code, see commits it you want to add it back)
+3. **Line Tools**
+  <br>FibRetracement, ParallelChannel, HorizontalLine, VerticalLine, Highlighter, CrossLine, TrendLine, Rectangle, Triangle, Brush,	Path, Text,	Ray, Arrow,	ExtendedLine,	HorizontalRay
+
+## <a name="crosshair-sync"></a>Crosshair Sync
+params data from the subscribe will look like 
+``{
+    "time": 1686576600,
+    "point": {
+        "x": 1621.5,
+        "y": 538.484375
+    }
+}``
+
+What I use in react
+````
+
+
+
+
+
+
+
+
+
+
+
+
+
+

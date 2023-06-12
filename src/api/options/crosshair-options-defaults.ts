@@ -20,6 +20,6 @@ export const crosshairOptionsDefaults: CrosshairOptions = {
 	},
 	mode: CrosshairMode.Magnet,
 	// testing to try and get graphics tests to pass, the crosshair magnet is messing them up
-	// magnetThreshold: 14,
-	magnetThreshold: 1000000,
+	magnetThreshold: 14,
+	// magnetThreshold: 1000000,
 };
