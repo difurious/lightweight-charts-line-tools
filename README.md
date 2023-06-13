@@ -110,12 +110,17 @@ As thanks for creating this product, we'd be grateful if you add it in a promine
 ---
 
 # Line Tools
+
+<video width="1280" height="720" controls>
+  <source src="./website/line-tools/line_tools_examples_001.mp4" type="video/mp4">
+</video>
+
 ## Acknowledgments
 
 <br>Sync crosshairs, and draggable was from [randalhsu](https://github.com/randalhsu/OPAL/tree/main/lightweight-charts-patch)
 <br>Initial rough code of line tools was from [iosiftalmacel](https://github.com/iosiftalmacel/)
 <br>Merge of iosiftalmacel's line tools to lightweight-charts 3.8.0 was done by Discord user **shinobaki**
-<br>Other line tools addition done by Discord user **difurious**
+<br>Other line tools additions done by Discord user **difurious**
 
 ---
 
@@ -331,6 +336,11 @@ The empty array is the point(s), points can look like this
 
  and the empty object at the end uses the default options.  It will create the line tool and wait for user input for a click to place it.  See "debug.html" to see all the options that are availible for each specific tool. Line Tool Options that exist but dont do anything are **angle**, 
 **scale**, **cap**, **join**
+
+---
+### Hold Shift on Some Line Tools
+
+If you hold shift when editing a line tool will create a straight horizontal line while editing.  Shift works on only these specific line tools ParallelChannel, TrendLine, Arrow, ExtendedLine, Ray
 
 ---
 
