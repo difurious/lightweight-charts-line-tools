@@ -106,7 +106,8 @@ As thanks for creating this product, we'd be grateful if you add it in a promine
 [deps-count-img]: https://img.shields.io/badge/dynamic/json.svg?label=dependecies&color=brightgreen&query=$.dependencyCount&uri=https%3A%2F%2Fbundlephobia.com%2Fapi%2Fsize%3Fpackage%3Dlightweight-charts
 [bundle-size-link]: https://bundlephobia.com/result?p=lightweight-charts
 
-<br>
+---
+---
 
 # Line Tools
 ## Acknowledgments
@@ -116,24 +117,316 @@ As thanks for creating this product, we'd be grateful if you add it in a promine
 <br>Merge of iosiftalmacel's line tools to lightweight-charts 3.8.0 was done by Discord user **shinobaki**
 <br>Other line tools addition done by Discord user **difurious**
 
+---
+
+## <a name="how-to-build"></a>How to Build
+1. Clone the project
+2. have node installed, you can google it
+3. cd into the clones project directory
+4. `npm install --force`
+5. `npm run build:prod`
+6. now you can view the debug.html in the root folder to view how the lineTools works
+
+---
+
 ## Main Features
 1. **[Crosshair Sync](#crosshair-sync)**
-2. **createPriceLine added ability to make a ray**  (draggable createPriceLine was removed from code, see commits it you want to add it back)
-3. **Line Tools**
-  <br>FibRetracement, ParallelChannel, HorizontalLine, VerticalLine, Highlighter, CrossLine, TrendLine, Rectangle, Triangle, Brush,	Path, Text,	Ray, Arrow,	ExtendedLine,	HorizontalRay
+2. **[createPriceLine added ability to make a ray](#create-price-line-ray)**  (draggable createPriceLine was removed from code, see [commit](https://github.com/difurious/lightweight-charts-line-tools/commit/140da15ba31057bb4bc7a6e22ccfd68320698e19) it you want to add it back)
+3. **[Line Tools](#how-to-use-line-tools)**
+  
+    FibRetracement, ParallelChannel, HorizontalLine, VerticalLine, Highlighter, CrossLine, TrendLine, Rectangle, Triangle, Brush,	Path, Text,	Ray, Arrow,	ExtendedLine,	HorizontalRay
+
+---
 
 ## <a name="crosshair-sync"></a>Crosshair Sync
 params data from the subscribe will look like 
-``{
+```js
+{
     "time": 1686576600,
     "point": {
         "x": 1621.5,
         "y": 538.484375
     }
-}``
+}
+```
 
 What I use in react
-````
+
+```jsx
+useEffect(() => {
+
+  if(chartReady === true){
+    console.log("inside useEffect for crosshair SyncHandler")
+
+    //used to store the previous xx time if the timeToCoord return null, then the crosshair would disapear
+    //so ill use this var to just display the previous candle vs it disapearring constantly
+    //TODO, this will only update when a new time interval from chart 1 is hit, so it techncicly
+    //shows the incorrect  time if time is between the 2 chart intervals
+    var crosshairPreviousXX = 0
+
+    //const crosshairSyncHandler = (param, seriesMaster, seriesSlave, fromChartNumber, chartToModify) => {
+    const crosshairSyncHandler = (param, fromChartNumber) => {
+      console.log("syncing crosshairs master is chart " + fromChartNumber)
+      console.log(param)
+
+      if(fromChartNumber === 1){
+        var chartToModify = chart2
+        var seriesMaster = candleSeriesRef
+        var seriesSlave = candleSeries2Ref
+      }
+
+      else if(fromChartNumber === 2) {
+        
+        var chartToModify = chart
+        var seriesMaster = candleSeries2Ref
+        var seriesSlave = candleSeriesRef
+        
+      }        
+
+      if(param.time !== undefined) {
+
+        //time axis
+        var xx = chartToModify.current.timeScale().timeToCoordinate(param.time);
+        var price = seriesMaster.current.coordinateToPrice(param.point.y)
+        //price axis
+        var yy = seriesSlave.current.priceToCoordinate(price);
+        //console.log("x cord = " + xx)
+        //console.log("y cord = " + yy)
+        //everything is good, so update the crosshair
+        if(xx !== null){
+          //console.log("both axis")
+          //console.log("x = " + xx)
+          //console.log("y = " + yy)
+          chartToModify.current.setCrossHairXY(xx,yy,true);
+          //set previous because xx is a lefit time
+          crosshairPreviousXX = xx
+        }
+        else{
+          //console.log("else")
+          //console.log("x = " + xx)
+          //console.log("y = " + yy)
+          //if xx is null than it did not respond with a time, so use crosshairPreviousXX so it displays something
+          chartToModify.current.setCrossHairXY(crosshairPreviousXX,yy,true);
+        }
+      }
+      
+      //time is undefined
+      else{
+        //point.y exists
+        if(param.point !== undefined){
+          //console.log("param.point.y = " + param.point.y )
+          var price = seriesMaster.current.coordinateToPrice(param.point.y)
+          //price axis
+          var yy = seriesSlave.current.priceToCoordinate(price); 
+          //only show the price axis
+          //console.log("x = " + xx)
+          //console.log("y = " + yy)
+          chartToModify.current.setCrossHairXY(null,yy,true); 
+        }
+
+        //no axis points exist, most likely cursor is in Y price scale axis
+        //point.y does not exist
+        else{
+          //clar the slave chart crosshair
+          chartToModify.current.clearCrossHair();
+        }
+      
+      }
+    }
+    
+    
+    const chart1CrosshairSyncHandler = (param) => {
+      crosshairSyncHandler(param, 1)
+    }
+    
+    const chart2CrosshairSyncHandler = (param) => {
+      crosshairSyncHandler(param, 2)
+    }         
+
+  
+    //chart 2 exists and sync crosshairs is enabled
+    if(chartReady === true && chart2Ready === true && syncCrosshairsDisabled === false && syncCrosshairsSelected === true){
+      console.log("inside sync crosshairs")
+  
+      //chart 1 active
+      if(pointerOverChart === 1){
+        if(chart2.current !== null && chart2ContainerRef.current !== null){
+          chart2.current.unsubscribeCrosshairMove(chart2CrosshairSyncHandler)
+        }
+        
+        chart.current.subscribeCrosshairMove(chart1CrosshairSyncHandler)
+      }
+
+      //chart 2 active
+      else if(pointerOverChart === 2){
+        chart.current.unsubscribeCrosshairMove(chart1CrosshairSyncHandler)
+        if(chart2.current !== null && chart2ContainerRef.current !== null){
+          chart2.current.subscribeCrosshairMove(chart2CrosshairSyncHandler)
+        }   
+      }      
+
+      return () => {
+        chart.current.unsubscribeCrosshairMove(chart1CrosshairSyncHandler)
+        if(chart2.current !== null && chart2ContainerRef.current !== null){
+          chart2.current.unsubscribeCrosshairMove(chart2CrosshairSyncHandler)
+        }
+        
+      }
+    }
+
+    //crosshair sync is not active, so unsubscribe to both events
+    else{
+      chart.current.unsubscribeCrosshairMove(chart1CrosshairSyncHandler)
+
+      if(chart2Ready === true && chart2.current !== null && chart2ContainerRef.current !== null){
+        chart2.current.unsubscribeCrosshairMove(chart2CrosshairSyncHandler)
+      }
+      
+    }
+  }
+
+}, [chartReady, chart2Ready, syncCrosshairsDisabled, syncCrosshairsSelected, pointerOverChart])
+```
+
+---
+
+## <a name="create-price-line-ray"></a>createPriceLine Ray
+
+Make a ray using the built in createPriceLine code. This requires the timestamp number to be provided.
+
+```js
+var manualLineToCreate =
+  {
+    price: #whateverPriceYouWant,
+    color: "yellow",
+    lineWidth: 1,
+    lineVisible: true,
+    lineStyle: LineStyle.Solid,
+    axisLabelVisible: true,
+    title: "#AddYourTitle",
+    draggable: true, //draggale is not in this build, wont hurt anything to leave this in
+    ray: true, //true to make the line a ray, needs rayStart if true.  If false then it will be a full horizontal line
+    rayStart: #theTimeStampToHaveTheRayStart,  //required if ray: true, this is a number and is the timeStamp for the ray to start
+  }
+
+//add the line
+manualLineToCreateFinal = candleSeriesRef.current.createPriceLine(manualLineToCreate)
+```
+---
+
+## <a name="how-to-use-line-tools"></a>How To Use LineTools
+1. read how to build the code [here](#how-to-build)
+2. open the file "debug.html" in the root folder with browser or edit to view code for an example of each Line Tool
+
+---
+
+### Create a Line Tool
+
+`chart.current.addLineTool("HorizontalLine",[],{})`
+
+This will create a Horizontal LineTool.
+The empty array is the point(s), points can look like this
+
+`[{price: #PRICE, timestamp: #TIMESTAMP}]`
+
+ and the empty object at the end uses the default options.  It will create the line tool and wait for user input for a click to place it.  See "debug.html" to see all the options that are availible for each specific tool. Line Tool Options that exist but dont do anything are **angle**, 
+**scale**, **cap**, **join**
+
+---
+
+### Line Tool Functionality
+
+```var allExistingLineTools = chart.current.exportLineTools()```
+
+exportLineTools() will export all existing line tools, it will be a JSON string
+
+```chart.current.importLineTools(chart.current.exportLineTools())```
+
+import line tools JSON string to be added to the chart, it compounds on top of any existing line tools. You could "chart.current.removeAllLineTools()" to deleted everyting first before the import
+
+```chart.current.removeAllLineTools()```
+
+deletes all line tools on the specific chart
+
+```chart.current.removeSelectedLineTools()```
+
+If you select a line tool on screen, then run this command, the selected line tool(s) will be deleted
+
+```js
+var applyLineToolOptionsOBJ = {
+    id: String(#idOfLineToolToModify),
+    toolType: String(#lineToolName),
+    options: {#optionsToChange},
+    points: [#pointsObject1,#pointsObject2],
+}
+chart.current.applyLineToolOptions(applyLineToolOptionsOBJ)
+```
+create a line tools object and apply it.  If the id matches, then it will update that specific line tool
+
+```var theSelectedLineTool = chart.current.getSelectedLineTools()```
+
+This wiill fetch the currently selected line tool, and return that line tools data in the format that exportLineTools() uses
+
+```chart.current.removeLineToolsById(arrayOfIDsToDelete)```
+
+Will delete any line tools that match these specific ID's.  It needs to be an array of string ID's ["id1","id2","id3","id4"]
+
+```chart.current.setActiveLineTool("#IdontKNowWhatToPassToThis")```
+
+Sorry, I dont know how to use this one, I have not needed to use this 
+
+```js 
+function lineToolWasDoubleClicked(params){
+    console.log(params)
+}
+
+chart.current.subscribeLineToolsDoubleClick(lineToolWasDoubleClicked);
+
+return () => {
+    chart.current.unsubscribeLineToolsDoubleClick(lineToolWasDoubleClicked);
+}
+```
+
+When a line tool is double clicked, params will be the specific line tool's export data.
+
+```js
+function lineToolFinishedEditingChart(params){
+  console.log("LineToolFinishedEditing EVENT")
+  console.log(params)
+  
+  //params will be
+  //{
+    //selectedLineTool: #exportedLineToolData,
+    //stage: string("#stageTheLineTool") 
+  //}
+  //stage can be
+  //  "lineToolEdited" this is after a line tool has ben edited after it has already been created
+  //  "pathFinished" this is when the path line tool finished being created
+  //  "lineToolFinished" this is when any line tool besides path just finished being created.
+}
+if(chartReady === true){
+  chart.current.subscribeLineToolsAfterEdit(lineToolFinishedEditingChart);
+
+
+  return () => {
+    chart.current.unsubscribeLineToolsAfterEdit(lineToolFinishedEditingChart);
+  }  
+}
+```
+
+Subscribe to when a line tool is edited, or on creation.  Take note of the stage to tell if it was just created or if it was edited after it has already been created
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
