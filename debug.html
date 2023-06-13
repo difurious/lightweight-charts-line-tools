@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0">
+	<title>Debug page</title>
+
+	<!-- <script type="text/javascript" src="./dist/lightweight-charts.standalone.production.js"></script> -->
+	<script type="text/javascript" src="./dist/lightweight-charts.standalone.development.js"></script>
+</head>
+
+<body style="padding: 0; margin: 0;">
+	<div id="container" style="position: absolute; width: 100%; height: 100%;"></div>
+
+	<script type="text/javascript">
+		const chart = LightweightCharts.createChart(document.getElementById('container'));
+const lineSeries = chart.addLineSeries();
+lineSeries.setData([
+    { time: '2019-04-11', value: 80.0 },
+    { time: '2019-04-12', value: 96.0 },
+    { time: '2019-04-13', value: 76.0 },
+    { time: '2019-04-14', value: 81.0 },
+    { time: '2019-04-15', value: 74.0 },
+    { time: '2019-04-16', value: 80.0 },
+    { time: '2019-04-17', value: 96.0 },
+    { time: '2019-04-18', value: 76.0 },
+    { time: '2019-04-19', value: 81.0 },
+    { time: '2019-04-20', value: 74.0 },
+]);
+
+const candlestickSeries = chart.addCandlestickSeries();
+candlestickSeries.setData([
+	{ time: '2019-04-21', open: 74, high: 90.39, low: 72.25, close: 85.72 },
+	{ time: '2019-04-22', open: 85.72, high: 91.39, low: 80.25, close: 82.72 }
+]);
+
+
+
+const newOptions = {
+  // Specify the options you want to change or add
+  // For example, to change the grid color:
+  grid: {
+    vertLines: {
+      color: 'rgba(0, 0, 0, 0.2)',
+	  visible: true
+    },
+	horzLines: {
+      color: 'rgba(0, 0, 0, 0.2)',
+	  visible: false
+    },
+  },
+  // Other options...
+};
+chart.applyOptions(newOptions);
+
+console.log(chart)
+
+const displayHorizontalLine = true;
+const displayRectangle = true;
+const displayVerticalLine = true;
+const displayHighlighter = true;
+const displayCrossline = true;
+const displayTrendline = true;
+const displayTriangle = true;
+const displayBrush = true;
+const displayPath = true;
+const displayText = true;
+const displayRay = true;
+const displayArrow = true;
+const displayExtendedLine = true;
+const displayHorizontalRay = true;
+const displayFibonnaciRetracement = true;
+const displayParallelChannel = true;
+
+// HorizontalLine
+if (displayHorizontalLine) {
+	const hlPrice = 90.0;
+	const hlTS = Date.parse('2019-04-11');
+	const hlPoint = {price: hlPrice, timestamp: hlTS};	
+
+	const HorizontalLineTool = chart.addLineTool('HorizontalLine', [hlPoint], {			
+		"text": {
+			"value": "HorizontalLine Line Tool",
+			"alignment": "left",
+			"font": {
+				"color": "rgba(41,98,255,1)",
+				"size": 20,
+				"bold": false,
+				"italic": false,
+				"family": "Arial"
+			},
+			"box": {
+				"alignment": {
+					"vertical": "top",
+					"horizontal": "left"
+				},
+				"angle": 0,
+				"scale": 1,
+				"offset": {
+					"x": 0,
+					"y": 0
+				},
+				"padding": {
+					"x": 0,
+					"y": 0
+				},
+				"maxHeight": 100,
+				"shadow": {
+					"blur": 0,
+					"color": "rgba(255,255,255,1)",
+					"offset": {
+						"x": 0,
+						"y": 0
+					}
+				},
+				"border": {
+					"color": "rgba(126,211,33,0)",
+					"width": 1,
+					"radius": 0,
+					"highlight": false,
+					"style": 0
+				},
+				"background": {
+					"color": "rgba(199,56,56,0)",
+					"inflation": {
+						"x": 0,
+						"y": 0
+					}
+				}
+			},
+			"padding": 0,
+			"wordWrapWidth": 0,
+			"forceTextAlign": false,
+			"forceCalculateMaxLineWidth": false
+		},
+		"line": {
+			"color": "rgba(41,98,255,1)",
+			"width": 1,
+			"style": 0,
+			"join": "round",
+			"cap": "square",
+			"end": {
+				"left": 0,
+				"right": 0
+			},
+			"extend": {
+				"right": true,
+				"left": true
+			}
+		},
+		"visible": true,
+		"editable": true
+	
+	});
+}
+
+
+// Rectangle
+if (displayRectangle) {
+	const rPrice1 = 89.0;
+	const rTS1 = Date.parse('2019-04-10') / 1000;
+	const rPointl = {price: rPrice1, timestamp: rTS1};
+
+	const rPrice2 = 87.0;
+	const rTS2 = Date.parse('2019-04-19') / 1000; 
+	const rPoint2 = {price: rPrice2, timestamp: rTS2};
+
+	var lineTools = chart.addLineTool('Rectangle', [rPointl, rPoint2], {
+		"text": {
+			"value": "Rectangle Line Tool",
+			"alignment": "left",
+			"font": {
+				"color": "rgba(41,98,255,1)",
+				"size": 20,
+				"bold": false,
+				"italic": false,
+				"family": "Arial"
+			},
+			"box": {
+				"alignment": {
+					"vertical": "middle",
+					"horizontal": "center"
+				},
+				"angle": 0,
+				"scale": 1,
+				"offset": {
+					"x": 0,
+					"y": 0
+				},
+				"padding": {
+					"x": 0,
+					"y": 0
+				},
+				"maxHeight": 100,
+				"shadow": {
+					"blur": 0,
+					"color": "rgba(255,255,255,1)",
+					"offset": {
+						"x": 0,
+						"y": 0
+					}
+				},
+				"border": {
+					"color": "rgba(126,211,33,0)",
+					"width": 4,
+					"radius": 0,
+					"highlight": false,
+					"style": 3
+				},
+				"background": {
+					"color": "rgba(199,56,56,0)",
+					"inflation": {
+						"x": 0,
+						"y": 0
+					}
+				}
+			},
+			"padding": 0,
+			"wordWrapWidth": 0,
+			"forceTextAlign": false,
+			"forceCalculateMaxLineWidth": false
+		},
+		"rectangle": {
+			"background": {
+				"color": "rgba(156,39,176,0.2)",
+				"inflation": {
+					"x": 0,
+					"y": 0
+				}
+			},
+			"border": {
+				"color": "rgba(39,176,80,1)",
+				"width": 3,
+				"radius": 0,
+				"highlight": false,
+				"style": 3
+			},
+			"extend": {
+				"right": false,
+				"left": false
+			}
+		},
+		"visible": true,
+		"editable": true
+	});
+}
+
+// VerticalLine
+if (displayVerticalLine) {
+	const vPrice = 88.0;
+	const vTS = Date.parse('2019-04-08') / 1000; 
+	const vPoint = {price: vPrice, timestamp: vTS};	
+
+	const verticalLineTool = chart.addLineTool('VerticalLine', [vPoint], {
+		"text": {
+			"value": "VerticalLine Line Tool",
+			"alignment": "left",
+			"font": {
+				"color": "rgba(41,98,255,1)",
+				"size": 20,
+				"bold": false,
+				"italic": false,
+				"family": "Arial"
+			},
+			"box": {
+				"alignment": {
+					"vertical": "bottom",
+					"horizontal": "center"
+				},
+				"angle": 0,
+				"scale": 1,
+				"offset": {
+					"x": 0,
+					"y": 0
+				},
+				"padding": {
+					"x": 0,
+					"y": 0
+				},
+				"maxHeight": 100,
+				"shadow": {
+					"blur": 0,
+					"color": "rgba(255,255,255,1)",
+					"offset": {
+						"x": 0,
+						"y": 0
+					}
+				},
+				"border": {
+					"color": "rgba(126,211,33,0)",
+					"width": 1,
+					"radius": 0,
+					"highlight": false,
+					"style": 0
+				},
+				"background": {
+					"color": "rgba(199,56,56,0)",
+					"inflation": {
+						"x": 0,
+						"y": 0
+					}
+				}
+			},
+			"padding": 0,
+			"wordWrapWidth": 0,
+			"forceTextAlign": false,
+			"forceCalculateMaxLineWidth": false
+		},
+		"line": {
+			"color": "rgba(41,98,255,1)",
+			"width": 2,
+			"style": 1,
+			"join": "round",
+			"cap": "square",
+			"end": {
+				"left": 0,
+				"right": 0
+			},
+			"extend": {
+				"right": false,
+				"left": false
+			}
+		},
+		"visible": true,
+		"editable": true
+	});
+}
+
+// Highlighter
+if (displayHighlighter) {
+	const hPrice1 = 95.0;
+	const hTS1 = Date.parse('2019-04-07') / 1000; 
+	const hPoint1 = {price: hPrice1, timestamp: hTS1};
+	const hPrice2 = 101.0;
+	const hTS2 = Date.parse('2019-04-15') / 1000; 
+	const hPoint2 = {price: hPrice2, timestamp: hTS2};	
+	const hPrice3 = 96.0;
+	const hTS3 = Date.parse('2019-04-22') / 1000; 
+	const hPoint3 = {price: hPrice3, timestamp: hTS3};	
+
+	const highlighterTool = chart.addLineTool('Highlighter', [hPoint1, hPoint2, hPoint3], {
+		"line": {
+			"color": "rgba(242,200,69,0.7)",
+			"width": 1,
+			"style": 0,
+			"join": "round",
+			"cap": "square",
+			"end": {
+				"left": 0,
+				"right": 0
+			},
+			"extend": {
+				"right": false,
+				"left": false
+			}
+		},
+		"visible": true,
+		"editable": true
+
+	});
+}
+
+// Crossline
+if (displayCrossline) {
+	const clPrice = 80.0;
+	const clTS = Date.parse('2019-04-03') / 1000; 
+	const clPoint = {price: clPrice, timestamp: clTS};	
+
+	const crossLineTool = chart.addLineTool('CrossLine', [clPoint], {
+		"line": {
+			"color": "rgba(255,41,175,1)",
+			"width": 2,
+			"style": 4,
+			"join": "round",
+			"cap": "square",
+			"end": {
+				"left": 0,
+				"right": 0
+			},
+			"extend": {
+				"right": false,
+				"left": false
+			}
+		},
+		"visible": true,
+		"editable": true
+	});
+}
+
+// TrendLine
+//Hold shift for a horizontal line when editing
+if (displayTrendline) {
+	const tlPrice1 = 77.0;
+	const tlTS1 = Date.parse('2019-04-11') / 1000; 
+	const tlPoint1 = {price: tlPrice1, timestamp: tlTS1};
+	const tlPrice2 = 72.0;
+	const tlTS2 = Date.parse('2019-04-15') / 1000; 
+	const tlPoint2 = {price: tlPrice2, timestamp: tlTS2};
+
+	const trendLineTool = chart.addLineTool('TrendLine', [tlPoint1, tlPoint2], {
+		"text": {
+			"value": "TrendLine with box",
+			"alignment": "left",
+			"font": {
+				"color": "rgba(255,255,255,1)",
+				"size": 14,
+				"bold": true,
+				"italic": true,
+				"family": "Arial"
+			},
+			"box": {
+				"alignment": {
+					"vertical": "bottom",
+					"horizontal": "center"
+				},
+				"angle": 0,
+				"scale": 1,
+				"offset": {
+					"x": 0,
+					"y": 20
+				},
+				"padding": {
+					"x": 0,
+					"y": 0
+				},
+				"maxHeight": 100,
+				"shadow": {
+					"blur": 0,
+					"color": "rgba(255,255,255,1)",
+					"offset": {
+						"x": 0,
+						"y": 0
+					}
+				},
+				"border": {
+					"color": "rgba(126,211,33,1)",
+					"width": 4,
+					"radius": 20,
+					"highlight": false,
+					"style": 1
+				},
+				"background": {
+					"color": "rgba(199,56,56,0.25)",
+					"inflation": {
+						"x": 10,
+						"y": 10
+					}
+				}
+			},
+			"padding": 0,
+			"wordWrapWidth": 0,
+			"forceTextAlign": false,
+			"forceCalculateMaxLineWidth": false
+		},
+		"line": {
+			"color": "rgba(41,98,255,1)",
+			"width": 4,
+			"style": 0,
+			"join": "round",
+			"cap": "square",
+			"end": {
+				"left": 0,
+				"right": 0
+			},
+			"extend": {
+				"right": false,
+				"left": false
+			}
+		},
+		"visible": true,
+		"editable": true
+	});
+}
+
+// Triangle
+if (displayTriangle) {
+	const tPrice1 = 87.0;
+	const tTS1 = Date.parse('2019-03-18') / 1000; 
+	const tPoint1 = {price: tPrice1, timestamp: tTS1};
+	const tPrice2 = 76.0;
+	const tTS2 = Date.parse('2019-03-18') / 1000; 
+	const tPoint2 = {price: tPrice2, timestamp: tTS2};	
+	const tPrice3 = 80.0;
+	const tTS3 = Date.parse('2019-03-25') / 1000; 
+	const tPoint3 = {price: tPrice3, timestamp: tTS3};	
+
+	const triangleTool = chart.addLineTool('Triangle', [tPoint1, tPoint2, tPoint3], {	
+		"triangle": {
+			"background": {
+				"color": "rgba(245,124,0,0.2)",
+				"inflation": {
+					"x": 0,
+					"y": 0
+				}
+			},
+			"border": {
+				"color": "rgba(0,108,245,1)",
+				"width": 2,
+				"radius": 0,
+				"highlight": false,
+				"style": 0
+			}
+		},
+		"visible": true,
+		"editable": true
+	});
+}
+
+// Brush
+if (displayBrush) {
+	const bPrice1 = 77.0;
+	const bTS1 = Date.parse('2019-03-24') / 1000; 
+	const bPoint1 = {price: bPrice1, timestamp: bTS1};
+	const bPrice2 = 71.0;
+	const bTS2 = Date.parse('2019-03-26') / 1000; 
+	const bPoint2 = {price: bPrice2, timestamp: bTS2};
+	const bPrice3 = 80.0;
+	const bTS3 = Date.parse('2019-03-27') / 1000; 
+	const bPoint3 = {price: bPrice3, timestamp: bTS3};
+	const bPrice4 = 73.0;
+	const bTS4 = Date.parse('2019-03-29') / 1000; 
+	const bPoint4 = {price: bPrice4, timestamp: bTS4};
+	const bPrice5 = 83.0;
+	const bTS5 = Date.parse('2019-03-31') / 1000; 
+	const bPoint5 = {price: bPrice5, timestamp: bTS5};
+
+	const brushTool = chart.addLineTool('Brush', [bPoint1, bPoint2, bPoint3, bPoint4, bPoint5], {
+		"line": {
+			"color": "rgba(0,188,212,1)",
+			"width": 3,
+			"style": 0,
+			"join": "bevel",
+			"cap": "square",
+			"end": {
+				"left": 1,
+				"right": 0
+			},
+			"extend": {
+				"right": false,
+				"left": false
+			}
+		},
+		"background": {
+			"color": "rgba(245,124,0,0)",
+			"inflation": {
+				"x": 0,
+				"y": 0
+			}
+		},
+		"visible": true,
+		"editable": true
+	});
+}
+
+// Path
+if (displayPath) {
+	const pPrice1 = 85.0;
+	const pTS1 = Date.parse('2019-03-29') / 1000; 
+	const pPoint1 = {price: pPrice1, timestamp: pTS1};
+	const pPrice2 = 91.0;
+	const pTS2 = Date.parse('2019-04-01') / 1000; 
+	const pPoint2 = {price: pPrice2, timestamp: pTS2};
+	const pPrice3 = 89.0;
+	const pTS3 = Date.parse('2019-04-04') / 1000; 
+	const pPoint3 = {price: pPrice3, timestamp: pTS3};
+	const pPrice4 = 94.0;
+	const pTS4 = Date.parse('2019-04-10') / 1000; 
+	const pPoint4 = {price: pPrice4, timestamp: pTS4};
+
+	const pathTool = chart.addLineTool('Path', [pPoint1, pPoint2, pPoint3, pPoint4], {
+		"line": {
+			"color": "rgba(126,211,33,1)",
+			"width": 3,
+			"style": 0,
+			"join": "round",
+			"cap": "square",
+			"end": {
+				"left": 0,
+				"right": 1
+			},
+			"extend": {
+				"right": false,
+				"left": false
+			}
+		},
+		"visible": true,
+		"editable": true
+	});
+}
+
+// Text
+if (displayText) {
+	const tePrice1 = 100.0;
+	const teTS1 = Date.parse('2019-04-14') / 1000; 
+	const tePoint1 = {price: tePrice1, timestamp: teTS1};
+
+	const textTool = chart.addLineTool('Text', [tePoint1], {
+		"text": {
+			"value": "Text Line Tool, below is highlighter",
+			"alignment": "left",
+			"font": {
+				"color": "rgba(255,255,255,1)",
+				"size": 14,
+				"bold": false,
+				"italic": false,
+				"family": "Arial"
+			},
+			"box": {
+				"alignment": {
+					"vertical": "top",
+					"horizontal": "left"
+				},
+				"angle": 0,
+				"scale": 1,
+				"offset": {
+					"x": 0,
+					"y": 0
+				},
+				"padding": {
+					"x": 0,
+					"y": 0
+				},
+				"maxHeight": 100,
+				"shadow": {
+					"blur": 0,
+					"color": "rgba(255,255,255,1)",
+					"offset": {
+						"x": 0,
+						"y": 0
+					}
+				},
+				"border": {
+					"color": "rgba(126,211,33,1)",
+					"width": 4,
+					"radius": 0,
+					"highlight": false,
+					"style": 0
+				},
+				"background": {
+					"color": "rgba(153,27,27,1)",
+					"inflation": {
+						"x": 10,
+						"y": 10
+					}
+				}
+			},
+			"padding": 0,
+			"wordWrapWidth": 0,
+			"forceTextAlign": false,
+			"forceCalculateMaxLineWidth": false
+		},
+		"visible": true,
+		"editable": true
+	});
+}
+
+// Ray
+//Hold shift for a horizontal line when editing
+if (displayRay) {
+	const rayPrice1 = 96.0;
+	const rayTS1 = Date.parse('2019-04-12') / 1000; 
+	const rayPoint1 = {price: rayPrice1, timestamp: rayTS1};
+	const rayPrice2 = 95.0;
+	const rayTS2 = Date.parse('2019-04-17') / 1000; 
+	const rayPoint2 = {price: rayPrice2, timestamp: rayTS2};
+
+	const rayTool = chart.addLineTool('Ray', [rayPoint1, rayPoint2], {
+		"text": {
+			"value": "Ray Line Tool",
+			"alignment": "left",
+			"font": {
+				"color": "rgba(255,255,255,1)",
+				"size": 12,
+				"bold": false,
+				"italic": false,
+				"family": "Arial"
+			},
+			"box": {
+				"alignment": {
+					"vertical": "middle",
+					"horizontal": "center"
+				},
+				"angle": 0,
+				"scale": 1,
+				"offset": {
+					"x": 0,
+					"y": 0
+				},
+				"padding": {
+					"x": 0,
+					"y": 0
+				},
+				"maxHeight": 100,
+				"shadow": {
+					"blur": 0,
+					"color": "rgba(255,255,255,1)",
+					"offset": {
+						"x": 0,
+						"y": 0
+					}
+				},
+				"border": {
+					"color": "rgba(126,211,33,0)",
+					"width": 1,
+					"radius": 0,
+					"highlight": false,
+					"style": 0
+				},
+				"background": {
+					"color": "rgba(144,19,254,1)",
+					"inflation": {
+						"x": 0,
+						"y": 0
+					}
+				}
+			},
+			"padding": 0,
+			"wordWrapWidth": 0,
+			"forceTextAlign": false,
+			"forceCalculateMaxLineWidth": false
+		},
+		"line": {
+			"color": "rgba(144,19,254,1)",
+			"width": 2,
+			"style": 0,
+			"join": "round",
+			"cap": "square",
+			"end": {
+				"left": 0,
+				"right": 0
+			},
+			"extend": {
+				"right": true,
+				"left": false
+			}
+		},
+		"visible": true,
+		"editable": true
+	});
+}
+
+// Arrow
+//Hold shift for a horizontal line when editing
+if (displayArrow) {
+	const aPrice1 = 86.0;
+	const aTS1 = Date.parse('2019-04-23') / 1000; 
+	const aPoint1 = {price: aPrice1, timestamp: aTS1};
+	const aPrice2 = 100.0;
+	const aTS2 = Date.parse('2019-05-05') / 1000; 
+	const aPoint2 = {price: aPrice2, timestamp: aTS2};
+
+	const aTool = chart.addLineTool('Arrow', [aPoint1, aPoint2], {
+		"text": {
+			"value": "Arrow Line Tool",
+			"alignment": "left",
+			"font": {
+				"color": "rgba(41,98,255,1)",
+				"size": 18,
+				"bold": false,
+				"italic": true,
+				"family": "Arial"
+			},
+			"box": {
+				"alignment": {
+					"vertical": "top",
+					"horizontal": "right"
+				},
+				"angle": 0,
+				"scale": 1,
+				"offset": {
+					"x": 20,
+					"y": 60
+				},
+				"padding": {
+					"x": 0,
+					"y": 0
+				},
+				"maxHeight": 100,
+				"shadow": {
+					"blur": 0,
+					"color": "rgba(255,255,255,1)",
+					"offset": {
+						"x": 0,
+						"y": 0
+					}
+				},
+				"border": {
+					"color": "rgba(126,211,33,0)",
+					"width": 1,
+					"radius": 0,
+					"highlight": false,
+					"style": 0
+				},
+				"background": {
+					"color": "rgba(199,56,56,0)",
+					"inflation": {
+						"x": 0,
+						"y": 0
+					}
+				}
+			},
+			"padding": 0,
+			"wordWrapWidth": 0,
+			"forceTextAlign": false,
+			"forceCalculateMaxLineWidth": false
+		},
+		"line": {
+			"color": "rgba(41,98,255,1)",
+			"width": 1,
+			"style": 0,
+			"join": "round",
+			"cap": "square",
+			"end": {
+				"left": 0,
+				"right": 1
+			},
+			"extend": {
+				"right": false,
+				"left": false
+			}
+		},
+		"visible": true,
+		"editable": true
+	});
+}
+
+// ExtendedLine
+//Hold shift for a horizontal line when editing
+if (displayExtendedLine) {
+	const elPrice1 = 86.0;
+	const elTS1 = Date.parse('2019-04-28') / 1000; 
+	const elPoint1 = {price: elPrice1, timestamp: elTS1};
+	const elPrice2 = 99.0;
+	const elTS2 = Date.parse('2019-05-05') / 1000; 
+	const elPoint2 = {price: elPrice2, timestamp: elTS2};
+
+	const elTool = chart.addLineTool('ExtendedLine', [elPoint1, elPoint2], {
+		"text": {
+			"value": "ExtendedLine Line Tool",
+			"alignment": "left",
+			"font": {
+				"color": "rgba(189,16,224,1)",
+				"size": 14,
+				"bold": false,
+				"italic": false,
+				"family": "Arial"
+			},
+			"box": {
+				"alignment": {
+					"vertical": "bottom",
+					"horizontal": "center"
+				},
+				"angle": 0,
+				"scale": 1,
+				"offset": {
+					"x": 0,
+					"y": 0
+				},
+				"padding": {
+					"x": 0,
+					"y": 0
+				},
+				"maxHeight": 100,
+				"shadow": {
+					"blur": 0,
+					"color": "rgba(255,255,255,1)",
+					"offset": {
+						"x": 0,
+						"y": 0
+					}
+				},
+				"border": {
+					"color": "rgba(126,211,33,0)",
+					"width": 1,
+					"radius": 0,
+					"highlight": false,
+					"style": 0
+				},
+				"background": {
+					"color": "rgba(199,56,56,0)",
+					"inflation": {
+						"x": 0,
+						"y": 0
+					}
+				}
+			},
+			"padding": 0,
+			"wordWrapWidth": 0,
+			"forceTextAlign": false,
+			"forceCalculateMaxLineWidth": false
+		},
+		"line": {
+			"color": "rgba(65,117,5,1)",
+			"width": 3,
+			"style": 0,
+			"join": "round",
+			"cap": "square",
+			"end": {
+				"left": 0,
+				"right": 0
+			},
+			"extend": {
+				"right": true,
+				"left": true
+			}
+		},
+		"visible": true,
+		"editable": true
+	});
+}
+
+// HorizontalRay - for some reason this does not work on startup, but at the bottom of this script
+//chart.addLineTool('HorizontalRay') , <-- this works
+//I have not had any issues with HorizontalRay besides this debug.html file, so im not going to worry about this
+if (displayHorizontalRay) {
+	const hrPrice = 85.0;
+	const hrTS = Date.parse('2019-04-25');
+	const hrPoint = {price: hrPrice, timestamp: hrTS};	
+
+	const HorizontalRayTool = chart.addLineTool('HorizontalRay', [hrPoint], {	
+		"text": {
+			"value": "HorizontalRay Line Tool",
+			"alignment": "left",
+			"font": {
+				"color": "rgba(255,255,255,1)",
+				"size": 12,
+				"bold": false,
+				"italic": false,
+				"family": "Arial"
+			},
+			"box": {
+				"alignment": {
+					"vertical": "bottom",
+					"horizontal": "left"
+				},
+				"angle": 0,
+				"scale": 1,
+				"offset": {
+					"x": 0,
+					"y": 0
+				},
+				"padding": {
+					"x": 0,
+					"y": 0
+				},
+				"maxHeight": 100,
+				"shadow": {
+					"blur": 0,
+					"color": "rgba(255,255,255,1)",
+					"offset": {
+						"x": 0,
+						"y": 0
+					}
+				},
+				"border": {
+					"color": "rgba(126,211,33,0)",
+					"width": 1,
+					"radius": 0,
+					"highlight": false,
+					"style": 0
+				},
+				"background": {
+					"color": "rgba(245,166,35,0.5)",
+					"inflation": {
+						"x": 0,
+						"y": 0
+					}
+				}
+			},
+			"padding": 0,
+			"wordWrapWidth": 0,
+			"forceTextAlign": false,
+			"forceCalculateMaxLineWidth": false
+		},
+		"line": {
+			"color": "rgba(245,166,35,1)",
+			"width": 2,
+			"style": 0,
+			"join": "round",
+			"cap": "square",
+			"end": {
+				"left": 0,
+				"right": 0
+			},
+			"extend": {
+				"right": true,
+				"left": false
+			}
+		},
+		"visible": true,
+		"editable": true
+	});
+}
+
+// Fibonacci Retracement
+if (displayFibonnaciRetracement) {
+	const fPrice1 = 76.0;
+	const fTS1 = Date.parse('2019-04-28') / 1000; 
+	const fPoint1 = {price: fPrice1, timestamp: fTS1};
+	const fPrice2 = 74.0;
+	const fTS2 = Date.parse('2019-05-03') / 1000; 
+	const fPoint2 = {price: fPrice2, timestamp: fTS2};
+
+	const fTool = chart.addLineTool('FibRetracement', [fPoint1, fPoint2], {
+		"line": {
+			"color": "rgba(41,98,255,1)",
+			"width": 1,
+			"style": 0,
+			"join": "round",
+			"cap": "square",
+			"end": {
+				"left": 0,
+				"right": 0
+			},
+			"extend": {
+				"right": false,
+				"left": false
+			}
+		},
+		"extend": {
+			"right": false,
+			"left": false
+		},
+		"levels": [
+			{
+				"color": "#787b86",
+				"coeff": 0,
+				"opacity": 0
+			},
+			{
+				"color": "#f23645",
+				"coeff": 0.236,
+				"opacity": 0
+			},
+			{
+				"color": "#81c784",
+				"coeff": 0.382,
+				"opacity": 0
+			},
+			{
+				"color": "#4caf50",
+				"coeff": 0.5,
+				"opacity": 0
+			},
+			{
+				"color": "#089981",
+				"coeff": 0.618,
+				"opacity": 0
+			},
+			{
+				"color": "#64b5f6",
+				"coeff": 0.786,
+				"opacity": 0
+			},
+			{
+				"color": "#787b86",
+				"coeff": 1,
+				"opacity": 0
+			},
+			{
+				"color": "#2962ff",
+				"coeff": 1.618,
+				"opacity": 0
+			},
+			{
+				"color": "#f23645",
+				"coeff": 2.618,
+				"opacity": 0
+			},
+			{
+				"color": "#9c27b0",
+				"coeff": 3.618,
+				"opacity": 0
+			},
+			{
+				"color": "#e91e63",
+				"coeff": 4.236,
+				"opacity": 0
+			}
+		],
+		"visible": true,
+		"editable": true
+ 		// need at least 11 levels to override default options.
+		// you can add dummy levels to get to 11 of them, just add them to coeff 0
+			//{color: '#787b86', coeff: 0, opacity: 0}
+	});
+}
+
+// Parallel Channel
+//Hold shift for a horizontal line when editing
+if (displayParallelChannel) {
+	const pcPrice1 = 100.0;
+	const pcTS1 = Date.parse('2019-03-01') / 1000; 
+	const pcPoint1 = {price: pcPrice1, timestamp: pcTS1};
+	const pcPrice2 = 98.0;
+	const pcTS2 = Date.parse('2019-03-25') / 1000; 
+	const pcPoint2 = {price: pcPrice2, timestamp: pcTS2};
+	const pcPrice3 = 94.0;
+	const pcTS3 = Date.parse('2019-03-25') / 1000; 
+	const pcPoint3 = {price: pcPrice3, timestamp: pcTS3};
+
+	const parallelChannelTool = chart.addLineTool('ParallelChannel', [pcPoint1, pcPoint2, pcPoint3], {
+		"channelLine": {
+			"color": "rgba(0,0,0,1)",
+			"width": 2,
+			"style": 3,
+			"join": "round",
+			"cap": "square",
+			"end": {
+				"left": 0,
+				"right": 0
+			},
+			"extend": {
+				"right": false,
+				"left": false
+			}
+		},
+		"middleLine": {
+			"color": "rgba(0,0,0,1)",
+			"width": 2,
+			"style": 3,
+			"join": "round",
+			"cap": "square",
+			"end": {
+				"left": 0,
+				"right": 0
+			},
+			"extend": {
+				"right": false,
+				"left": false
+			}
+		},
+		"showMiddleLine": true,
+		"extend": {
+			"right": false,
+			"left": false
+		},
+		"background": {
+			"color": "rgba(80,227,194,0.1)",
+			"inflation": {
+				"x": 0,
+				"y": 0
+			}
+		},
+		"visible": true,
+		"editable": true
+	});
+}
+
+//manually place a linetool without points specified "[]".  You could also not define options and it will use defaults and still let you place it
+//chart.addLineTool('HorizontalRay')  <-- will use default options and you can place it wherever you want, no need to specify options
+//this works on render with options and no points specified.
+chart.addLineTool('HorizontalRay',[],
+	{	
+		"text": {
+			"value": "HorizontalRay Line Tool",
+			"alignment": "left",
+			"font": {
+				"color": "rgba(0,0,0,1)",
+				"size": 12,
+				"bold": false,
+				"italic": false,
+				"family": "Arial"
+			},
+			"box": {
+				"alignment": {
+					"vertical": "bottom",
+					"horizontal": "left"
+				},
+				"angle": 0,
+				"scale": 1,
+				"offset": {
+					"x": 0,
+					"y": 0
+				},
+				"padding": {
+					"x": 0,
+					"y": 0
+				},
+				"maxHeight": 100,
+				"shadow": {
+					"blur": 0,
+					"color": "rgba(255,255,255,1)",
+					"offset": {
+						"x": 0,
+						"y": 0
+					}
+				},
+				"border": {
+					"color": "rgba(126,211,33,0)",
+					"width": 1,
+					"radius": 0,
+					"highlight": false,
+					"style": 0
+				},
+				"background": {
+					"color": "rgba(245,166,35,0.5)",
+					"inflation": {
+						"x": 0,
+						"y": 0
+					}
+				}
+			},
+			"padding": 0,
+			"wordWrapWidth": 0,
+			"forceTextAlign": false,
+			"forceCalculateMaxLineWidth": false
+		},
+		"line": {
+			"color": "rgba(245,166,35,1)",
+			"width": 2,
+			"style": 0,
+			"join": "round",
+			"cap": "square",
+			"end": {
+				"left": 0,
+				"right": 0
+			},
+			"extend": {
+				"right": true,
+				"left": false
+			}
+		},
+		"visible": true,
+		"editable": true
+	}
+);
+	</script>
+</body>
+
+</html>
