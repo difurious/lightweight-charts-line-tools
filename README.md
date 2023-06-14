@@ -111,9 +111,16 @@ As thanks for creating this product, we'd be grateful if you add it in a promine
 
 # Line Tools
 
-<video width="1280" height="720" controls>
-  <source src="./website/line-tools/line_tools_examples_001.mp4" type="video/mp4">
-</video>
+## Video
+
+https://github.com/difurious/lightweight-charts-line-tools/assets/61764595/14db38dd-420a-4c61-bab4-9d92783d30d4
+
+---
+
+## About
+Line Tools is build off of [lightweight-charts 3.8.0](https://github.com/tradingview/lightweight-charts/tree/v3.8.0).  It adds multiple interactive drawing tools.
+
+---
 
 ## Acknowledgments
 
@@ -121,6 +128,22 @@ As thanks for creating this product, we'd be grateful if you add it in a promine
 <br>Initial rough code of line tools was from [iosiftalmacel](https://github.com/iosiftalmacel/)
 <br>Merge of iosiftalmacel's line tools to lightweight-charts 3.8.0 was done by Discord user **shinobaki**
 <br>Other line tools additions done by Discord user **difurious**
+
+---
+
+## Takslist
+- [ ] Optimize the code that currently exists
+- [ ] Fix npm install so you dont need to use --force
+- [ ] When you commit, it complains about tsconfig.json, need to figure out why, "commit --no-verify" works for now
+- [ ] Update Line Tools to use lightweight-charts 4.x.x
+- [ ] Convert to plugin when that exists on lightweight-charts 4.x.x
+- [ ] Add new line tools
+- [ ] Add line tools related functionality to aid in trading
+
+---
+## Known Bugs
+- If trying to use some tools in a blank area to the left of the first data point, it might now show
+- Some line tools options do nothing "angle, scale, cap, join"
 
 ---
 
@@ -136,7 +159,7 @@ As thanks for creating this product, we'd be grateful if you add it in a promine
 
 ## Main Features
 1. **[Crosshair Sync](#crosshair-sync)**
-2. **[createPriceLine added ability to make a ray](#create-price-line-ray)**  (draggable createPriceLine was removed from code, see [commit](https://github.com/difurious/lightweight-charts-line-tools/commit/140da15ba31057bb4bc7a6e22ccfd68320698e19) it you want to add it back)
+2. **[createPriceLine added ability to make a horizontal ray](#create-price-line-ray)**  (draggable createPriceLine was removed from code, see [commit](https://github.com/difurious/lightweight-charts-line-tools/commit/140da15ba31057bb4bc7a6e22ccfd68320698e19) it you want to add it back)
 3. **[Line Tools](#how-to-use-line-tools)**
   
     FibRetracement, ParallelChannel, HorizontalLine, VerticalLine, Highlighter, CrossLine, TrendLine, Rectangle, Triangle, Brush,	Path, Text,	Ray, Arrow,	ExtendedLine,	HorizontalRay
@@ -311,7 +334,7 @@ var manualLineToCreate =
     title: "#AddYourTitle",
     draggable: true, //draggale is not in this build, wont hurt anything to leave this in
     ray: true, //true to make the line a ray, needs rayStart if true.  If false then it will be a full horizontal line
-    rayStart: #theTimeStampToHaveTheRayStart,  //required if ray: true, this is a number and is the timeStamp for the ray to start
+    rayStart: #theTimeStampToHaveTheRayStart,  //required if ray: true, this is the timeStamp for the ray to start
   }
 
 //add the line
@@ -327,63 +350,76 @@ manualLineToCreateFinal = candleSeriesRef.current.createPriceLine(manualLineToCr
 
 ### Create a Line Tool
 
-`chart.current.addLineTool("HorizontalLine",[],{})`
+This will create a Horizontal LineTool.  
+> `chart.current.addLineTool("HorizontalLine",[],{})`
 
-This will create a Horizontal LineTool.
 The empty array is the point(s), points can look like this
+> `[{price: #PRICE, timestamp: #TIMESTAMP}]`
 
-`[{price: #PRICE, timestamp: #TIMESTAMP}]`
-
- and the empty object at the end uses the default options.  It will create the line tool and wait for user input for a click to place it.  See "debug.html" to see all the options that are availible for each specific tool. Line Tool Options that exist but dont do anything are **angle**, 
-**scale**, **cap**, **join**
+ and the empty object at the end uses the default options.  It will create the line tool and wait for user input for a click to place it.  See "debug.html" to see all the options that are availible for each specific tool. Line Tool Options that exist but dont do anything are
+ * angle, scale, cap, join
 
 ---
 ### Hold Shift on Some Line Tools
 
-If you hold shift when editing a line tool will create a straight horizontal line while editing.  Shift works on only these specific line tools ParallelChannel, TrendLine, Arrow, ExtendedLine, Ray
+If you hold shift when editing a line tool will create a straight horizontal line while editing.  Shift works on only these specific line tools
+* ParallelChannel, TrendLine, Arrow, ExtendedLine, Ray
 
 ---
 
 ### Line Tool Functionality
-
-```var allExistingLineTools = chart.current.exportLineTools()```
-
+<br>
 exportLineTools() will export all existing line tools, it will be a JSON string
 
-```chart.current.importLineTools(chart.current.exportLineTools())```
+> ```var allExistingLineTools = chart.current.exportLineTools()```
 
-import line tools JSON string to be added to the chart, it compounds on top of any existing line tools. You could "chart.current.removeAllLineTools()" to deleted everyting first before the import
+<br>
+import line tools JSON string and it will be added to the chart, it compounds on top of any existing line tools, even if id's have duplictes. You could "chart.current.removeAllLineTools()" to deleted everyting first before the import
 
-```chart.current.removeAllLineTools()```
+> ```chart.current.importLineTools(chart.current.exportLineTools())```
 
+<br>
 deletes all line tools on the specific chart
 
-```chart.current.removeSelectedLineTools()```
+> ```chart.current.removeAllLineTools()```
 
+<br>
 If you select a line tool on screen, then run this command, the selected line tool(s) will be deleted
 
+> ```chart.current.removeSelectedLineTools()```
+
+<br>
+create a line tool object and apply it to an existing line by having the "id" match
+
 ```js
-var applyLineToolOptionsOBJ = {
-    id: String(#idOfLineToolToModify),
-    toolType: String(#lineToolName),
-    options: {#optionsToChange},
-    points: [#pointsObject1,#pointsObject2],
-}
-chart.current.applyLineToolOptions(applyLineToolOptionsOBJ)
+  var applyLineToolOptionsOBJ = {
+      id: String(#idOfLineToolToModify),
+      toolType: String(#lineToolName),
+      options: {#optionsToChange},
+      points: [#pointsObject1,#pointsObject2],
+  }
+  chart.current.applyLineToolOptions(applyLineToolOptionsOBJ)
 ```
-create a line tools object and apply it.  If the id matches, then it will update that specific line tool
+<br>
 
-```var theSelectedLineTool = chart.current.getSelectedLineTools()```
+Get the currently selected line tool, and return that line tools data in the format that exportLineTools() uses
+> ```var theSelectedLineTool = chart.current.getSelectedLineTools()```
 
-This wiill fetch the currently selected line tool, and return that line tools data in the format that exportLineTools() uses
+<br>
 
-```chart.current.removeLineToolsById(arrayOfIDsToDelete)```
+Delete any line tools that match these specific ID's.  It needs to be an array of string ID's
 
-Will delete any line tools that match these specific ID's.  It needs to be an array of string ID's ["id1","id2","id3","id4"]
+```chart.current.removeLineToolsById(["id1","id2","id3","id4"])```
+
+<br>
+
+Sorry, I dont know how to use this one, I have not needed to use this 
 
 ```chart.current.setActiveLineTool("#IdontKNowWhatToPassToThis")```
 
-Sorry, I dont know how to use this one, I have not needed to use this 
+<br>
+
+When a line tool is double clicked, params will be the specific line tool's export data.
 
 ```js 
 function lineToolWasDoubleClicked(params){
@@ -397,7 +433,9 @@ return () => {
 }
 ```
 
-When a line tool is double clicked, params will be the specific line tool's export data.
+<br>
+
+Subscribe to when a line tool is edited, or on creation.  Take note of the stage to tell if it was just created or if it was edited after it has already been created.
 
 ```js
 function lineToolFinishedEditingChart(params){
@@ -424,7 +462,7 @@ if(chartReady === true){
 }
 ```
 
-Subscribe to when a line tool is edited, or on creation.  Take note of the stage to tell if it was just created or if it was edited after it has already been created
+
 
 
 
