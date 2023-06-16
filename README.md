@@ -113,7 +113,7 @@ As thanks for creating this product, we'd be grateful if you add it in a promine
 
 ## Video
 
-https://github.com/difurious/lightweight-charts-line-tools/assets/61764595/14db38dd-420a-4c61-bab4-9d92783d30d4
+https://github.com/difurious/lightweight-charts-line-tools/assets/61764595/250ce779-9797-45fb-9f0b-2b9d51899376
 
 ---
 
@@ -131,7 +131,7 @@ Line Tools is build off of [lightweight-charts 3.8.0](https://github.com/trading
 
 ---
 
-## Takslist
+## Tasklist
 - [ ] Optimize the code that currently exists
 - [ ] Fix npm install so you dont need to use --force
 - [ ] When you commit, it complains about tsconfig.json, need to figure out why, "commit --no-verify" works for now
