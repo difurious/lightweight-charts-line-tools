@@ -359,6 +359,16 @@ export interface FibRetracementLevel {
      * Opacity of the background.
      */
 	opacity: number;
+
+    /**
+     * enable or disable the ability to calulate distance from current coeff from x coeff.
+     */
+	distanceFromCoeffEnabled: boolean;
+
+    /**
+     * distance from current coeff from stated coeff in this option.
+     */
+	distanceFromCoeff: number;
 }
 
 export interface LineToolOptionsCommon {

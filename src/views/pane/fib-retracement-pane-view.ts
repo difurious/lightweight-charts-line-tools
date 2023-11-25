@@ -48,7 +48,32 @@ export class FibRetracementPaneView extends LineToolPaneView {
 			const maxX = Math.max(this._points[0].x, this._points[1].x);
 			const levelCoordinates = this._levelsData(this._source.points()[0].price, this._source.points()[1].price, options.levels);
 
+			let distanceTextToDisplay = '';
+
+			const findIndexByKeyValue = (levels: FibRetracementLevel[], keyToFind: keyof FibRetracementLevel, valueToFind: number): number => {
+				for (let i = 0; i < levels.length; i++) {
+					if (levels[i][keyToFind] === valueToFind) {
+						return i; // Found the key and value, return the index
+					}
+				}
+				return -1; // Key and value not found in the array
+			};
+
 			for (let i = 0, j = -1; i < levelCoordinates.length; i++, j++) {
+				if (options.levels[i].distanceFromCoeffEnabled) {
+					const compareToIndex = findIndexByKeyValue(options.levels, 'coeff', options.levels[i].distanceFromCoeff);
+
+					if (compareToIndex >= 0) {
+						const compareToPrice = Number(levelCoordinates[compareToIndex].price);
+						const currentPrice = Number(levelCoordinates[i].price);
+						const priceDiference = Math.abs(currentPrice - compareToPrice);
+
+						if (priceDiference > 0) {
+							distanceTextToDisplay = '>>>>' + priceDiference + ' from ' + options.levels[compareToIndex].coeff + ' line';
+						}
+					}
+				}
+
 				if (!this._lineRenderers[i]) {
 					this._lineRenderers.push(new SegmentRenderer());
 					this._labelRenderers.push(new TextRenderer());
@@ -66,12 +91,14 @@ export class FibRetracementPaneView extends LineToolPaneView {
 				this._labelRenderers[i].setData({
 					text: {
 						alignment: TextAlignment.Right,
-						value: `${options.levels[i].coeff}(${levelCoordinates[i].price})`,
+						value: `${options.levels[i].coeff}(${levelCoordinates[i].price})${distanceTextToDisplay}`,
 						font: { color: options.levels[i].color, size: 11, family: defaultFontFamily },
 						box: { alignment: { horizontal: BoxHorizontalAlignment.Right, vertical: BoxVerticalAlignment.Middle } },
 					},
 					points: linePoints,
 				});
+
+				distanceTextToDisplay = '';
 
 				compositeRenderer.append(this._labelRenderers[i]);
 				compositeRenderer.append(this._lineRenderers[i]);
