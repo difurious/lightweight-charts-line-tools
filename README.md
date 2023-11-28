@@ -138,11 +138,12 @@ Line Tools is build off of [lightweight-charts 3.8.0](https://github.com/trading
 - [ ] Update Line Tools to use lightweight-charts 4.x.x
 - [ ] Convert to plugin when that exists on lightweight-charts 4.x.x
 - [ ] Add new line tools
+- [X] Add new line tool - Circle
 - [ ] Add line tools related functionality to aid in trading
 
 ---
 ## Known Bugs
-- If trying to use some tools in a blank area to the left of the first data point, it might now show
+- If trying to use some tools in a blank area to the left of the first data point, it might not show
 - Some line tools options do nothing "angle, scale, cap, join"
 
 ---
@@ -154,6 +155,7 @@ Line Tools is build off of [lightweight-charts 3.8.0](https://github.com/trading
 4. `npm install --force`
 5. `npm run build:prod`
 6. now you can view the debug.html in the root folder to view how the lineTools works
+7. built files are located in /dist 
 
 ---
 
@@ -162,7 +164,7 @@ Line Tools is build off of [lightweight-charts 3.8.0](https://github.com/trading
 2. **[createPriceLine added ability to make a horizontal ray](#create-price-line-ray)**  (draggable createPriceLine was removed from code, see [commit](https://github.com/difurious/lightweight-charts-line-tools/commit/140da15ba31057bb4bc7a6e22ccfd68320698e19) it you want to add it back)
 3. **[Line Tools](#how-to-use-line-tools)**
   
-    FibRetracement, ParallelChannel, HorizontalLine, VerticalLine, Highlighter, CrossLine, TrendLine, Rectangle, Triangle, Brush,	Path, Text,	Ray, Arrow,	ExtendedLine,	HorizontalRay
+    FibRetracement, ParallelChannel, HorizontalLine, VerticalLine, Highlighter, CrossLine, TrendLine, Rectangle, Triangle, Brush,	Path, Text,	Ray, Arrow,	ExtendedLine,	HorizontalRay, Circle
 
 ---
 
@@ -363,7 +365,7 @@ The empty array is the point(s), points can look like this
 ### Hold Shift on Some Line Tools
 
 If you hold shift when editing a line tool will create a straight horizontal line while editing.  Shift works on only these specific line tools
-* ParallelChannel, TrendLine, Arrow, ExtendedLine, Ray
+* ParallelChannel, TrendLine, Arrow, ExtendedLine, Ray, Rectangle, FibRetracement
 
 ---
 

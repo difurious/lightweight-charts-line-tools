@@ -58,6 +58,7 @@ console.log(chart)
 
 const displayHorizontalLine = true;
 const displayRectangle = true;
+const displayCircle = true;
 const displayVerticalLine = true;
 const displayHighlighter = true;
 const displayCrossline = true;
@@ -243,6 +244,96 @@ if (displayRectangle) {
 		},
 		"visible": true,
 		"editable": true
+	});
+}
+
+// Circle
+if (displayCircle) {
+	const rPrice1 = 69.0;
+	const rTS1 = Date.parse('2019-02-20') / 1000;
+	const rPointl = {price: rPrice1, timestamp: rTS1};
+
+	const rPrice2 = 68.5;
+	const rTS2 = Date.parse('2019-03-24') / 1000; 
+	const rPoint2 = {price: rPrice2, timestamp: rTS2};
+
+	var lineTools = chart.addLineTool('Circle', [rPointl, rPoint2], {
+		"text": {
+			"value": "circle text\nline 2 of text",
+			"alignment": "center",
+			"font": {
+				"color": "rgba(255,255,255,1)",
+				"size": 18,
+				"bold": false,
+				"italic": false,
+				"family": "Roboto"
+			},
+			"box": {
+				"alignment": {
+					"vertical": "bottom",
+					"horizontal": "right"
+				},
+				"angle": 0,
+				"scale": 1,
+				"offset": {
+					"x": 0,
+					"y": 10
+				},
+				"padding": {
+					"x": 0,
+					"y": 0
+				},
+				"maxHeight": 500,
+				"shadow": {
+					"blur": 50,
+					"color": "rgba(248,231,28,1)",
+					"offset": {
+						"x": 10,
+						"y": 10
+					}
+				},
+				"border": {
+					"color": "rgba(126,211,33,1)",
+					"width": 4,
+					"radius": 50,
+					"highlight": false,
+					"style": 3
+				},
+				"background": {
+					"color": "rgba(208,2,27,1)",
+					"inflation": {
+						"x": 20,
+						"y": 20
+					}
+				}
+			},
+			"padding": 30,
+			"wordWrapWidth": 0,
+			"forceTextAlign": false,
+			"forceCalculateMaxLineWidth": false
+		},
+		"circle": {
+			"background": {
+				"color": "rgba(39,176,119,0.2)",
+				"inflation": {
+					"x": 20,
+					"y": 20
+				}
+			},
+			"border": {
+				"color": "rgba(156,39,176,0.5)",
+				"width": 4,
+				"radius": 50,
+				"highlight": false,
+				"style": 3
+			},
+			"extend": {
+				"right": true, //does not do anything, left in for ease of use with rectangle settings
+				"left": false  //does not do anything, left in for ease of use with rectangle settings
+			}
+		},
+		"visible": true,
+		"editable": true,
 	});
 }
 

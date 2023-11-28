@@ -33,6 +33,7 @@ export abstract class LineToolPaneView implements IUpdatablePaneView, IInputEven
 	protected _editedPointIndex: number | null = null;
 	protected _lineAnchorRenderers: LineAnchorRenderer[] = [];
 	protected _renderer: IPaneRenderer | null = null;
+	protected _onMouseDownInitialPoints: AnchorPoint[] = [];
 
 	public constructor(source: LineTool<LineToolType>, model: ChartModel) {
 		this._source = source;
@@ -201,7 +202,7 @@ export abstract class LineToolPaneView implements IUpdatablePaneView, IInputEven
 			paneWidget.setCursor(this._editedPointIndex !== null ? PaneCursorType.Default : PaneCursorType.Grabbing);
 
 			if (this._editedPointIndex !== null) {
-				this._tryApplyLineToolShift(appliedPoint, event, true);
+				this._tryApplyLineToolShift(appliedPoint, event, true, originPoint);
 
 				this._source.setPoint(this._editedPointIndex, this._source.screenPointToPoint(appliedPoint) as LineToolPoint);
 			} else if (this._lastMovePoint) {
@@ -222,7 +223,7 @@ export abstract class LineToolPaneView implements IUpdatablePaneView, IInputEven
 		if (!this._source.finished()) {
 			if (this._source.hasMagnet()) { this._model.magnet().enable(); }
 
-			this._tryApplyLineToolShift(appliedPoint, event, false);
+			this._tryApplyLineToolShift(appliedPoint, event, false, originPoint);
 
 			this._source.setLastPoint(this._source.screenPointToPoint(appliedPoint) as LineToolPoint);
 		} else {
@@ -245,8 +246,11 @@ export abstract class LineToolPaneView implements IUpdatablePaneView, IInputEven
 	}
 
 	protected _onMouseDown(paneWidget: PaneWidget, ctx: CanvasRenderingContext2D, originPoint: Point, appliedPoint: Point, event: TouchMouseEvent): boolean {
+		// lock in points location on mouseDown to use with shift event for fib and rectangle
+		this._onMouseDownInitialPoints = this._points;
+
 		if (!this._source.finished()) {
-			this._tryApplyLineToolShift(appliedPoint, event, false);
+			this._tryApplyLineToolShift(appliedPoint, event, false, originPoint);
 
 			this._source.addPoint(this._source.screenPointToPoint(appliedPoint) as LineToolPoint);
 			return false;
@@ -300,8 +304,9 @@ export abstract class LineToolPaneView implements IUpdatablePaneView, IInputEven
 		return this._lineAnchorRenderers[index];
 	}
 
-	protected _tryApplyLineToolShift(appliedPoint: Point, event: TouchMouseEvent, useEditedPointIndex: boolean): void {
+	protected _tryApplyLineToolShift(appliedPoint: Point, event: TouchMouseEvent, useEditedPointIndex: boolean, originPoint: Point): void {
 		const isTrendLine = this._isTrendLine();
+		const toolTypeStr = String(this._source.toolType());
 
 		// if shift, isTrendLine = true and at least 1 point exists already
 		if (event.shiftKey === true && isTrendLine === true && this._points.length > 0) {
@@ -326,6 +331,21 @@ export abstract class LineToolPaneView implements IUpdatablePaneView, IInputEven
 					// override point 2's y with point 1's y
 					appliedPoint.y = this._points[0].y;
 				}
+			}
+		}
+
+		if (toolTypeStr === 'FibRetracement' && event.shiftKey === true && this._points.length === 2 && this._editedPointIndex !== null && this._onMouseDownInitialPoints.length === 2) {
+			appliedPoint.y = this._onMouseDownInitialPoints[this._editedPointIndex].y;
+		}
+
+		if (toolTypeStr === 'Rectangle' && event.shiftKey === true && this._points.length === 2 && this._editedPointIndex !== null && this._onMouseDownInitialPoints.length === 2) {
+			// a rectangle has multiple indexes.
+			// 0,3 are at the top corners.  top has 0,6,3 going from left to right
+			// 2,1 are at the top corners.  top has 2,7,1 going from left to right
+			if (this._editedPointIndex === 0 || this._editedPointIndex === 3) {
+				appliedPoint.y = this._onMouseDownInitialPoints[0].y;
+			} else if (this._editedPointIndex === 1 || this._editedPointIndex === 2) {
+				appliedPoint.y = this._onMouseDownInitialPoints[1].y;
 			}
 		}
 	}

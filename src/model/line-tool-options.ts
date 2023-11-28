@@ -282,6 +282,23 @@ export interface RectangleOptions {
 	extend: ExtendOptions;
 }
 
+export interface CircleOptions {
+	/**
+	 * Circle background.
+	 */
+	background: Omit<BackroundOptions, 'inflation'>;
+
+	/**
+	 * Circle border.
+	*/
+	border: Omit<BorderOptions, 'radius' | 'highlight'>;
+
+	/**
+	 * Circle extend sides.
+	 */
+	extend: ExtendOptions;
+}
+
 export interface TriangleOptions {
 	/**
 	 * Triangle background.
@@ -489,6 +506,20 @@ export interface LineToolRectangleOptions {
 }
 
 /**
+ * Represents style options for a circle.
+ */
+export interface LineToolCircleOptions {
+	/**
+	 * Text config.
+	 */
+	text: TextOptions;
+	/**
+	 * Circle config.
+	 */
+	circle: CircleOptions;
+}
+
+/**
  * Represents style options for a triangle.
  */
 export interface LineToolTriangleOptions {
@@ -601,6 +632,9 @@ export type HorizontalLineToolPartialOptions = LineToolPartialOptions<LineToolHo
 export type RectangleToolOptions = LineToolOptions<LineToolRectangleOptions>;
 export type RectangleToolPartialOptions = LineToolPartialOptions<LineToolRectangleOptions>;
 
+export type CircleToolOptions = LineToolOptions<LineToolCircleOptions>;
+export type CircleToolPartialOptions = LineToolPartialOptions<LineToolCircleOptions>;
+
 export type TriangleToolOptions = LineToolOptions<LineToolTriangleOptions>;
 export type TriangleToolPartialOptions = LineToolPartialOptions<LineToolTriangleOptions>;
 
@@ -622,6 +656,7 @@ export interface LineToolOptionsMap {
 	CrossLine: CrossLineToolOptions;
 	TrendLine: TrendLineToolOptions;
 	Rectangle: RectangleToolOptions;
+	Circle: CircleToolOptions;
 	Triangle: TriangleToolOptions;
 	Brush: BrushToolOptions;
 	Path: PathToolOptions;
@@ -645,6 +680,7 @@ export interface LineToolPartialOptionsMap {
 	CrossLine: CrossLineToolPartialOptions;
 	TrendLine: TrendLineToolPartialOptions;
 	Rectangle: RectangleToolPartialOptions;
+	Circle: CircleToolPartialOptions;
 	Triangle: TriangleToolPartialOptions;
 	Brush: BrushToolPartialOptions;
 	Path: PathToolPartialOptions;
