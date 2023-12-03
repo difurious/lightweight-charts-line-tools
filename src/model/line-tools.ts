@@ -2,6 +2,7 @@
 import { LineTool } from './line-tool';
 import { LineToolArrow } from './line-tool-arrow';
 import { LineToolBrush } from './line-tool-brush';
+import { LineToolCallout } from './line-tool-callout';
 import { LineToolCircle } from './line-tool-circle';
 import { LineToolCrossLine } from './line-tool-cross-line';
 import { LineToolExtendedLine } from './line-tool-extended-line';
@@ -28,6 +29,7 @@ export const LineTools: Record<LineToolType, new(...args: any) => LineTool<LineT
 	Highlighter: LineToolHighlighter,
 	CrossLine: LineToolCrossLine,
 	TrendLine: LineToolTrendLine,
+	Callout: LineToolCallout,
 	Rectangle: LineToolRectangle,
 	Circle: LineToolCircle,
 	Triangle: LineToolTriangle,

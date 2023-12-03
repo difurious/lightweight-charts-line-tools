@@ -424,6 +424,20 @@ export interface LineToolTrendLineOptions {
 }
 
 /**
+ * Represents style options for a callout.
+ */
+export interface LineToolCalloutOptions {
+	/**
+	 * Text config.
+	 */
+	text: TextOptions;
+	/**
+	 * Line config.
+	 */
+	line: Omit<LineOptions, 'join' | 'cap'>;
+}
+
+/**
  * Represents style options for a horizotnal line.
  */
 export interface LineToolHorizontalLineOptions {
@@ -620,6 +634,9 @@ export type TextToolPartialOptions = LineToolPartialOptions<LineToolTextOptions>
 export type TrendLineToolOptions = LineToolOptions<LineToolTrendLineOptions>;
 export type TrendLineToolPartialOptions = LineToolPartialOptions<LineToolTrendLineOptions>;
 
+export type CalloutToolOptions = LineToolOptions<LineToolCalloutOptions>;
+export type CalloutToolPartialOptions = LineToolPartialOptions<LineToolCalloutOptions>;
+
 export type CrossLineToolOptions = LineToolOptions<LineToolCrossLineOptions>;
 export type CrossLineToolPartialOptions = LineToolPartialOptions<LineToolCrossLineOptions>;
 
@@ -655,6 +672,7 @@ export interface LineToolOptionsMap {
 	Highlighter: HighlighterToolOptions;
 	CrossLine: CrossLineToolOptions;
 	TrendLine: TrendLineToolOptions;
+	Callout: CalloutToolOptions;
 	Rectangle: RectangleToolOptions;
 	Circle: CircleToolOptions;
 	Triangle: TriangleToolOptions;
@@ -679,6 +697,7 @@ export interface LineToolPartialOptionsMap {
 	Highlighter: HighlighterToolPartialOptions;
 	CrossLine: CrossLineToolPartialOptions;
 	TrendLine: TrendLineToolPartialOptions;
+	Callout: CalloutToolPartialOptions;
 	Rectangle: RectangleToolPartialOptions;
 	Circle: CircleToolPartialOptions;
 	Triangle: TriangleToolPartialOptions;

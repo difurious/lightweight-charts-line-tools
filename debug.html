@@ -63,6 +63,7 @@ const displayVerticalLine = true;
 const displayHighlighter = true;
 const displayCrossline = true;
 const displayTrendline = true;
+const displayCallout = true;
 const displayTriangle = true;
 const displayBrush = true;
 const displayPath = true;
@@ -257,7 +258,7 @@ if (displayCircle) {
 	const rTS2 = Date.parse('2019-03-24') / 1000; 
 	const rPoint2 = {price: rPrice2, timestamp: rTS2};
 
-	var lineTools = chart.addLineTool('Circle', [rPointl, rPoint2], {
+	var circleLineTools = chart.addLineTool('Circle', [rPointl, rPoint2], {
 		"text": {
 			"value": "circle text\nline 2 of text",
 			"alignment": "center",
@@ -561,6 +562,90 @@ if (displayTrendline) {
 		},
 		"visible": true,
 		"editable": true
+	});
+}
+
+// Callout
+if (displayCallout) {
+	const tlPrice1 = 71.68;
+	const tlTS1 = Date.parse('2019-04-21') / 1000; 
+	const tlPoint1 = {price: tlPrice1, timestamp: tlTS1};
+	const tlPrice2 = 66.70;
+	const tlTS2 = Date.parse('2019-04-30') / 1000; 
+	const tlPoint2 = {price: tlPrice2, timestamp: tlTS2};
+
+	const calloutTool = chart.addLineTool('Callout', [tlPoint1, tlPoint2], {
+        "text": {
+            "value": "callout tool text",
+            "alignment": "left",
+            "font": {
+                "color": "rgba(255,255,255,1)",
+                "size": 14,
+                "bold": false,
+                "italic": false,
+                "family": "Arial"
+            },
+            "box": {
+                "alignment": {
+                    "vertical": "middle",
+                    "horizontal": "center"
+                },
+                "angle": 0,
+                "scale": 1,
+                "offset": {
+                    "x": 0,
+                    "y": 0
+                },
+                "padding": {
+                    "x": 0,
+                    "y": 0
+                },
+                "maxHeight": 500,
+                "shadow": {
+                    "blur": 0,
+                    "color": "rgba(255,255,255,1)",
+                    "offset": {
+                        "x": 0,
+                        "y": 0
+                    }
+                },
+                "border": {
+                    "color": "rgba(74,144,226,1)",
+                    "width": 4,
+                    "radius": 20,
+                    "highlight": false,
+                    "style": 0
+                },
+                "background": {
+                    "color": "rgba(19,73,133,1)",
+                    "inflation": {
+                        "x": 10,
+                        "y": 10
+                    }
+                }
+            },
+            "padding": 0,
+            "wordWrapWidth": 150,
+            "forceTextAlign": false,
+            "forceCalculateMaxLineWidth": true
+        },
+        "line": {
+            "color": "rgba(74,144,226,1)",
+            "width": 2,
+            "style": 0,
+            "join": "round",
+            "cap": "square",
+            "end": {
+                "left": 1,
+                "right": 0
+            },
+            "extend": {
+                "right": false,
+                "left": false
+            }
+        },
+        "visible": true,
+        "editable": true
 	});
 }
 

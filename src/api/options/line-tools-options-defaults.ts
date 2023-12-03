@@ -3,7 +3,7 @@ import { applyAlpha } from '../../helpers/color';
 import { defaultFontFamily } from '../../helpers/make-font';
 import { clone, merge } from '../../helpers/strict-type-checks';
 
-import { BoxHorizontalAlignment, BoxVerticalAlignment, BrushToolOptions, CircleToolOptions, CrossLineToolOptions, FibRetracementToolOptions, HighlighterToolOptions, HorizontalLineToolOptions, LineJoin, ParallelChannelToolOptions, PathToolOptions, RectangleToolOptions, TextAlignment, TextOptions, TextToolOptions, TrendLineToolOptions, TriangleToolOptions, VerticalLineToolOptions } from '../../model/line-tool-options';
+import { BoxHorizontalAlignment, BoxVerticalAlignment, BrushToolOptions, CalloutToolOptions, CircleToolOptions, CrossLineToolOptions, FibRetracementToolOptions, HighlighterToolOptions, HorizontalLineToolOptions, LineJoin, ParallelChannelToolOptions, PathToolOptions, RectangleToolOptions, TextAlignment, TextOptions, TextToolOptions, TrendLineToolOptions, TriangleToolOptions, VerticalLineToolOptions } from '../../model/line-tool-options';
 
 import { LineEnd, LineStyle } from '../..';
 
@@ -29,6 +29,72 @@ export const TrendLineOptionDefaults: TrendLineToolOptions = {
 		end: { left: LineEnd.Normal, right: LineEnd.Normal },
 	},
 	text: TextDefaults,
+};
+
+export const CalloutOptionDefaults: CalloutToolOptions = {
+	visible: true,
+	editable: true,
+	line: {
+		width: 2,
+		color: 'rgba(74,144,226,1)',
+		style: LineStyle.Solid,
+		extend: { left: false, right: false },
+		end: { left: LineEnd.Arrow, right: LineEnd.Normal },
+	},
+	text: {
+		value: 'this is some text',
+		padding: 0,
+		wordWrapWidth: 150,
+		forceTextAlign: false,
+		forceCalculateMaxLineWidth: true,
+		alignment: TextAlignment.Left,
+		font: {
+			family: defaultFontFamily,
+			color: 'rgba(255,255,255,1)',
+			size: 14,
+			bold: false,
+			italic: false,
+		},
+		box: {
+			scale: 1,
+			angle: 0,
+			alignment: {
+				vertical: BoxVerticalAlignment.Middle,
+				horizontal: BoxHorizontalAlignment.Center,
+			},
+			offset: {
+				x: 0,
+				y: 0,
+			},
+			padding: {
+				x: 0,
+				y: 0,
+			},
+			maxHeight: 500,
+			shadow: {
+				blur: 0,
+				color: 'rgba(255,255,255,1)',
+				offset: {
+					x: 0,
+					y: 0,
+				},
+			},
+			border: {
+				color: 'rgba(74,144,226,1)',
+				width: 4,
+				radius: 20,
+				highlight: false,
+				style: 0,
+			},
+			background: {
+				color: 'rgba(19,73,133,1)',
+				inflation: {
+					x: 10,
+					y: 10,
+				},
+			},
+		},
+	},
 };
 
 export const HorizontalLineOptionDefaults: HorizontalLineToolOptions = {
@@ -167,6 +233,7 @@ export const LineToolsOptionDefaults = {
 	Highlighter: HighlighterOptionDefaults,
 	CrossLine: CrossLineOptionDefaults,
 	TrendLine: TrendLineOptionDefaults,
+	Callout: CalloutOptionDefaults,
 	Rectangle: RectangleOptionDefaults,
 	Circle: CircleOptionDefaults,
 	Triangle: TriangleOptionDefaults,
