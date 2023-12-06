@@ -119,19 +119,16 @@ https://github.com/difurious/lightweight-charts-line-tools/assets/61764595/250ce
 
 ## Line Tools Examples
 
-| ![Arrow](https://github.com/difurious/lightweight-charts-line-tools/assets/61764595/a911417c-2c1b-4267-8d48-bf4f98992c7b) | ![Brush](https://github.com/difurious/lightweight-charts-line-tools/assets/61764595/6c90bf3d-0e4a-44d0-a7de-11885719f186) | ![Callout](https://github.com/difurious/lightweight-charts-line-tools/assets/61764595/975c917d-472a-466f-89e0-6be507448a83) |
-
-| ![Circle](https://github.com/difurious/lightweight-charts-line-tools/assets/61764595/eebe6b23-67d7-4213-abfc-ae285fb0014d) | ![CrossLine](https://github.com/difurious/lightweight-charts-line-tools/assets/61764595/9d5f7e89-6297-42c5-89f3-f22eea91fcb8) | ![ExtendedLine](https://github.com/difurious/lightweight-charts-line-tools/assets/61764595/01eb1e2b-a3eb-423a-bfe0-b39b08d497e2) |
-
-| ![FibRetracement](https://github.com/difurious/lightweight-charts-line-tools/assets/61764595/8a6aeeed-9921-42d7-ba2f-dcaf13757687) | ![Highlighter](https://github.com/difurious/lightweight-charts-line-tools/assets/61764595/a8b37235-b1f0-4a4c-aee1-a45bb82ec2d1) | ![HorizontalLine](https://github.com/difurious/lightweight-charts-line-tools/assets/61764595/b448536b-d25b-4f19-a402-3b104b26358c) |
-
-| ![HorizontalRay](https://github.com/difurious/lightweight-charts-line-tools/assets/61764595/88b784e5-071f-4409-9587-3183d6cbc0e1) | ![ParallelChannel](https://github.com/difurious/lightweight-charts-line-tools/assets/61764595/1f8cdd55-f5a1-43e2-af14-c12211631a6f) | ![Path](https://github.com/difurious/lightweight-charts-line-tools/assets/61764595/c6f42a75-9c31-4ad5-90e3-657e9e791d8e) |
-
-| ![PriceRange](https://github.com/difurious/lightweight-charts-line-tools/assets/61764595/a50ba3ed-e3dc-44e1-86e4-cf4e4e960b63) | ![Ray](https://github.com/difurious/lightweight-charts-line-tools/assets/61764595/93a51e9b-f8fe-4c70-a5fa-dc741b954968) | ![Rectangle](https://github.com/difurious/lightweight-charts-line-tools/assets/61764595/e58a827b-1839-4bb0-b6b4-0ac2524bee52) |
-
-| ![Text](https://github.com/difurious/lightweight-charts-line-tools/assets/61764595/320e4f31-ad24-4d9c-b6de-eef3ddbafafa) | ![TrendLine](https://github.com/difurious/lightweight-charts-line-tools/assets/61764595/deae3f8c-17f6-4af7-a8f6-fdae9e626285) | ![Triangle](https://github.com/difurious/lightweight-charts-line-tools/assets/61764595/d6b97024-0230-4d0b-b47d-6cc132e2b311) |
-
-| ![VerticalLine](https://github.com/difurious/lightweight-charts-line-tools/assets/61764595/4f7f2418-06f5-49bd-926d-3a0c8f1e758a) |
+![Arrow](https://github.com/difurious/lightweight-charts-line-tools/assets/61764595/a911417c-2c1b-4267-8d48-bf4f98992c7b) ![Brush](https://github.com/difurious/lightweight-charts-line-tools/assets/61764595/6c90bf3d-0e4a-44d0-a7de-11885719f186)
+![Callout](https://github.com/difurious/lightweight-charts-line-tools/assets/61764595/975c917d-472a-466f-89e0-6be507448a83) ![Circle](https://github.com/difurious/lightweight-charts-line-tools/assets/61764595/eebe6b23-67d7-4213-abfc-ae285fb0014d)
+![CrossLine](https://github.com/difurious/lightweight-charts-line-tools/assets/61764595/9d5f7e89-6297-42c5-89f3-f22eea91fcb8) ![ExtendedLine](https://github.com/difurious/lightweight-charts-line-tools/assets/61764595/01eb1e2b-a3eb-423a-bfe0-b39b08d497e2)
+![FibRetracement](https://github.com/difurious/lightweight-charts-line-tools/assets/61764595/8a6aeeed-9921-42d7-ba2f-dcaf13757687) ![Highlighter](https://github.com/difurious/lightweight-charts-line-tools/assets/61764595/a8b37235-b1f0-4a4c-aee1-a45bb82ec2d1)
+![HorizontalLine](https://github.com/difurious/lightweight-charts-line-tools/assets/61764595/b448536b-d25b-4f19-a402-3b104b26358c) ![HorizontalRay](https://github.com/difurious/lightweight-charts-line-tools/assets/61764595/88b784e5-071f-4409-9587-3183d6cbc0e1)
+![ParallelChannel](https://github.com/difurious/lightweight-charts-line-tools/assets/61764595/1f8cdd55-f5a1-43e2-af14-c12211631a6f) ![Path](https://github.com/difurious/lightweight-charts-line-tools/assets/61764595/c6f42a75-9c31-4ad5-90e3-657e9e791d8e)
+![PriceRange](https://github.com/difurious/lightweight-charts-line-tools/assets/61764595/a50ba3ed-e3dc-44e1-86e4-cf4e4e960b63) ![Ray](https://github.com/difurious/lightweight-charts-line-tools/assets/61764595/93a51e9b-f8fe-4c70-a5fa-dc741b954968)
+![Rectangle](https://github.com/difurious/lightweight-charts-line-tools/assets/61764595/e58a827b-1839-4bb0-b6b4-0ac2524bee52) ![Text](https://github.com/difurious/lightweight-charts-line-tools/assets/61764595/320e4f31-ad24-4d9c-b6de-eef3ddbafafa)
+![TrendLine](https://github.com/difurious/lightweight-charts-line-tools/assets/61764595/deae3f8c-17f6-4af7-a8f6-fdae9e626285) ![Triangle](https://github.com/difurious/lightweight-charts-line-tools/assets/61764595/d6b97024-0230-4d0b-b47d-6cc132e2b311)
+![VerticalLine](https://github.com/difurious/lightweight-charts-line-tools/assets/61764595/4f7f2418-06f5-49bd-926d-3a0c8f1e758a)
 
 ---
 
