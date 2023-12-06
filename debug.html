@@ -59,6 +59,7 @@ console.log(chart)
 const displayHorizontalLine = true;
 const displayRectangle = true;
 const displayCircle = true;
+const displayPriceRange = true;
 const displayVerticalLine = true;
 const displayHighlighter = true;
 const displayCrossline = true;
@@ -337,6 +338,98 @@ if (displayCircle) {
 		"editable": true,
 	});
 }
+
+// PriceRange
+if (displayPriceRange) {
+	const rPrice1 = 95.3;
+	const rTS1 = Date.parse('2019-05-09') / 1000;
+	const rPointl = {price: rPrice1, timestamp: rTS1};
+
+	const rPrice2 = 85.3;
+	const rTS2 = Date.parse('2019-05-20') / 1000; 
+	const rPoint2 = {price: rPrice2, timestamp: rTS2};
+
+	var lineTools = chart.addLineTool('PriceRange', [rPointl, rPoint2], {
+		"text": {
+			"value": "Price Range Line Tool",
+			"alignment": "left",
+			"font": {
+				"color": "rgba(41,98,255,1)",
+				"size": 16,
+				"bold": false,
+				"italic": false,
+				"family": "Arial"
+			},
+			"box": {
+				"alignment": {
+					"vertical": "top",
+					"horizontal": "center"
+				},
+				"angle": 0,
+				"scale": 1,
+				"offset": {
+					"x": 0,
+					"y": 0
+				},
+				"padding": {
+					"x": 0,
+					"y": 0
+				},
+				"maxHeight": 100,
+				"shadow": {
+					"blur": 0,
+					"color": "rgba(255,255,255,1)",
+					"offset": {
+						"x": 0,
+						"y": 0
+					}
+				},
+				"border": {
+					"color": "rgba(126,211,33,0)",
+					"width": 4,
+					"radius": 0,
+					"highlight": false,
+					"style": 3
+				},
+				"background": {
+					"color": "rgba(199,56,56,0)",
+					"inflation": {
+						"x": 0,
+						"y": 0
+					}
+				}
+			},
+			"padding": 0,
+			"wordWrapWidth": 0,
+			"forceTextAlign": false,
+			"forceCalculateMaxLineWidth": false
+		},
+		"priceRange": {
+			"background": {
+				"color": "rgba(156,39,176,0.2)",
+				"inflation": {
+					"x": 0,
+					"y": 0
+				}
+			},
+			"border": {
+				"color": "rgba(39,176,80,1)",
+				"width": 3,
+				"radius": 0,
+				"highlight": false,
+				"style": 3
+			},
+			"extend": {
+				"right": false,
+				"left": false
+			}
+		},
+		"visible": true,
+		"editable": true
+	});
+}
+
+
 
 // VerticalLine
 if (displayVerticalLine) {
@@ -1202,57 +1295,79 @@ if (displayFibonnaciRetracement) {
 			{
 				"color": "#787b86",
 				"coeff": 0,
-				"opacity": 0
+				"opacity": 0,
+				"distanceFromCoeffEnabled": false,
+				"distanceFromCoeff": 0,
 			},
 			{
 				"color": "#f23645",
 				"coeff": 0.236,
-				"opacity": 0
+				"opacity": 0,
+				"distanceFromCoeffEnabled": false,
+				"distanceFromCoeff": 0,
 			},
 			{
 				"color": "#81c784",
 				"coeff": 0.382,
-				"opacity": 0
+				"opacity": 0,
+				"distanceFromCoeffEnabled": false,
+				"distanceFromCoeff": 0,
 			},
 			{
 				"color": "#4caf50",
 				"coeff": 0.5,
-				"opacity": 0
+				"opacity": 0,
+				"distanceFromCoeffEnabled": false,
+				"distanceFromCoeff": 0,
 			},
 			{
 				"color": "#089981",
 				"coeff": 0.618,
-				"opacity": 0
+				"opacity": 0,
+				"distanceFromCoeffEnabled": false,
+				"distanceFromCoeff": 0,
 			},
 			{
 				"color": "#64b5f6",
 				"coeff": 0.786,
-				"opacity": 0
+				"opacity": 0,
+				"distanceFromCoeffEnabled": false,
+				"distanceFromCoeff": 0,
 			},
 			{
 				"color": "#787b86",
 				"coeff": 1,
-				"opacity": 0
+				"opacity": 0,
+				"distanceFromCoeffEnabled": false,
+				"distanceFromCoeff": 0,
 			},
 			{
 				"color": "#2962ff",
 				"coeff": 1.618,
-				"opacity": 0
+				"opacity": 0,
+				"distanceFromCoeffEnabled": false,
+				"distanceFromCoeff": 0,
 			},
 			{
 				"color": "#f23645",
 				"coeff": 2.618,
-				"opacity": 0
+				"opacity": 0,
+				"distanceFromCoeffEnabled": false,
+				"distanceFromCoeff": 0,
 			},
 			{
 				"color": "#9c27b0",
 				"coeff": 3.618,
-				"opacity": 0
+				"opacity": 0,
+				"distanceFromCoeffEnabled": true,
+				"distanceFromCoeff": 1.618,
 			},
 			{
 				"color": "#e91e63",
 				"coeff": 4.236,
-				"opacity": 0
+				"opacity": 0,
+				"distanceFromCoeffEnabled": false,
+				"distanceFromCoeff": 0,
 			}
 		],
 		"visible": true,

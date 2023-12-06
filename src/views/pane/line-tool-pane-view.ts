@@ -308,6 +308,9 @@ export abstract class LineToolPaneView implements IUpdatablePaneView, IInputEven
 		const isTrendLine = this._isTrendLine();
 		const toolTypeStr = String(this._source.toolType());
 
+		// console.log('editing point index number');
+		// console.log(this._editedPointIndex);
+
 		// if shift, isTrendLine = true and at least 1 point exists already
 		if (event.shiftKey === true && isTrendLine === true && this._points.length > 0) {
 			// override point
@@ -348,6 +351,17 @@ export abstract class LineToolPaneView implements IUpdatablePaneView, IInputEven
 				appliedPoint.y = this._onMouseDownInitialPoints[1].y;
 			}
 		}
+
+		if (toolTypeStr === 'PriceRange' && event.shiftKey === true && this._points.length === 2 && this._editedPointIndex !== null && this._onMouseDownInitialPoints.length === 2) {
+			// a rectangle has multiple indexes.
+			// 0,3 are at the top corners.  top has 0,6,3 going from left to right
+			// 2,1 are at the top corners.  top has 2,7,1 going from left to right
+			if (this._editedPointIndex === 0 || this._editedPointIndex === 3) {
+				appliedPoint.y = this._onMouseDownInitialPoints[0].y;
+			} else if (this._editedPointIndex === 1 || this._editedPointIndex === 2) {
+				appliedPoint.y = this._onMouseDownInitialPoints[1].y;
+			}
+		}		
 	}
 
 	protected _isTrendLine(): boolean {

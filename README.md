@@ -117,6 +117,24 @@ https://github.com/difurious/lightweight-charts-line-tools/assets/61764595/250ce
 
 ---
 
+## Line Tools Examples
+
+| ![Arrow](https://github.com/difurious/lightweight-charts-line-tools/assets/61764595/a911417c-2c1b-4267-8d48-bf4f98992c7b) | ![Brush](https://github.com/difurious/lightweight-charts-line-tools/assets/61764595/6c90bf3d-0e4a-44d0-a7de-11885719f186) | ![Callout](https://github.com/difurious/lightweight-charts-line-tools/assets/61764595/975c917d-472a-466f-89e0-6be507448a83) |
+
+| ![Circle](https://github.com/difurious/lightweight-charts-line-tools/assets/61764595/eebe6b23-67d7-4213-abfc-ae285fb0014d) | ![CrossLine](https://github.com/difurious/lightweight-charts-line-tools/assets/61764595/9d5f7e89-6297-42c5-89f3-f22eea91fcb8) | ![ExtendedLine](https://github.com/difurious/lightweight-charts-line-tools/assets/61764595/01eb1e2b-a3eb-423a-bfe0-b39b08d497e2) |
+
+| ![FibRetracement](https://github.com/difurious/lightweight-charts-line-tools/assets/61764595/8a6aeeed-9921-42d7-ba2f-dcaf13757687) | ![Highlighter](https://github.com/difurious/lightweight-charts-line-tools/assets/61764595/a8b37235-b1f0-4a4c-aee1-a45bb82ec2d1) | ![HorizontalLine](https://github.com/difurious/lightweight-charts-line-tools/assets/61764595/b448536b-d25b-4f19-a402-3b104b26358c) |
+
+| ![HorizontalRay](https://github.com/difurious/lightweight-charts-line-tools/assets/61764595/88b784e5-071f-4409-9587-3183d6cbc0e1) | ![ParallelChannel](https://github.com/difurious/lightweight-charts-line-tools/assets/61764595/1f8cdd55-f5a1-43e2-af14-c12211631a6f) | ![Path](https://github.com/difurious/lightweight-charts-line-tools/assets/61764595/c6f42a75-9c31-4ad5-90e3-657e9e791d8e) |
+
+| ![PriceRange](https://github.com/difurious/lightweight-charts-line-tools/assets/61764595/a50ba3ed-e3dc-44e1-86e4-cf4e4e960b63) | ![Ray](https://github.com/difurious/lightweight-charts-line-tools/assets/61764595/93a51e9b-f8fe-4c70-a5fa-dc741b954968) | ![Rectangle](https://github.com/difurious/lightweight-charts-line-tools/assets/61764595/e58a827b-1839-4bb0-b6b4-0ac2524bee52) |
+
+| ![Text](https://github.com/difurious/lightweight-charts-line-tools/assets/61764595/320e4f31-ad24-4d9c-b6de-eef3ddbafafa) | ![TrendLine](https://github.com/difurious/lightweight-charts-line-tools/assets/61764595/deae3f8c-17f6-4af7-a8f6-fdae9e626285) | ![Triangle](https://github.com/difurious/lightweight-charts-line-tools/assets/61764595/d6b97024-0230-4d0b-b47d-6cc132e2b311) |
+
+| ![VerticalLine](https://github.com/difurious/lightweight-charts-line-tools/assets/61764595/4f7f2418-06f5-49bd-926d-3a0c8f1e758a) |
+
+---
+
 ## About
 Line Tools is build off of [lightweight-charts 3.8.0](https://github.com/tradingview/lightweight-charts/tree/v3.8.0).  It adds multiple interactive drawing tools.
 
@@ -139,12 +157,15 @@ Line Tools is build off of [lightweight-charts 3.8.0](https://github.com/trading
 - [ ] Convert to plugin when that exists on lightweight-charts 4.x.x
 - [ ] Add new line tools
 - [X] Add new line tool - Circle
+- [X] Add new line tool - Callout
+- [X] Add new line tool - Price Range
 - [ ] Add line tools related functionality to aid in trading
 
 ---
 ## Known Bugs
 - If trying to use some tools in a blank area to the left of the first data point, it might not show
 - Some line tools options do nothing "angle, scale, cap, join"
+- The Circle tool, if the 2nd point is to the left of the 1st point, and you pan the screen to the right so the 1st point goes off the screen, then the circle will disappear. Just put the 2nd point to the right of the 1st point to prevent.
 
 ---
 
@@ -164,7 +185,7 @@ Line Tools is build off of [lightweight-charts 3.8.0](https://github.com/trading
 2. **[createPriceLine added ability to make a horizontal ray](#create-price-line-ray)**  (draggable createPriceLine was removed from code, see [commit](https://github.com/difurious/lightweight-charts-line-tools/commit/140da15ba31057bb4bc7a6e22ccfd68320698e19) it you want to add it back)
 3. **[Line Tools](#how-to-use-line-tools)**
   
-    FibRetracement, ParallelChannel, HorizontalLine, VerticalLine, Highlighter, CrossLine, TrendLine, Rectangle, Triangle, Brush,	Path, Text,	Ray, Arrow,	ExtendedLine,	HorizontalRay, Circle
+    FibRetracement, ParallelChannel, HorizontalLine, VerticalLine, Highlighter, CrossLine, TrendLine, Rectangle, Triangle, Brush,	Path, Text,	Ray, Arrow,	ExtendedLine,	HorizontalRay, Circle, Callout, PriceRange
 
 ---
 

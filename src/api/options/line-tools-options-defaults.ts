@@ -3,7 +3,7 @@ import { applyAlpha } from '../../helpers/color';
 import { defaultFontFamily } from '../../helpers/make-font';
 import { clone, merge } from '../../helpers/strict-type-checks';
 
-import { BoxHorizontalAlignment, BoxVerticalAlignment, BrushToolOptions, CalloutToolOptions, CircleToolOptions, CrossLineToolOptions, FibRetracementToolOptions, HighlighterToolOptions, HorizontalLineToolOptions, LineJoin, ParallelChannelToolOptions, PathToolOptions, RectangleToolOptions, TextAlignment, TextOptions, TextToolOptions, TrendLineToolOptions, TriangleToolOptions, VerticalLineToolOptions } from '../../model/line-tool-options';
+import { BoxHorizontalAlignment, BoxVerticalAlignment, BrushToolOptions, CalloutToolOptions, CircleToolOptions, CrossLineToolOptions, FibRetracementToolOptions, HighlighterToolOptions, HorizontalLineToolOptions, LineJoin, ParallelChannelToolOptions, PathToolOptions, PriceRangeToolOptions, RectangleToolOptions, TextAlignment, TextOptions, TextToolOptions, TrendLineToolOptions, TriangleToolOptions, VerticalLineToolOptions } from '../../model/line-tool-options';
 
 import { LineEnd, LineStyle } from '../..';
 
@@ -174,6 +174,17 @@ export const CircleOptionDefaults: CircleToolOptions = {
 	text: TextDefaults,
 };
 
+export const PriceRangeOptionDefaults: PriceRangeToolOptions = {
+	visible: true,
+	editable: true,
+	priceRange: {
+		extend: { left: false, right: false },
+		background: { color: applyAlpha('#9c27b0', 0.2) },
+		border: { width: 1, style: LineStyle.Solid, color: '#9c27b0' },
+	},
+	text: TextDefaults,
+};
+
 export const TriangleOptionDefaults: TriangleToolOptions = {
 	visible: true,
 	editable: true,
@@ -236,6 +247,7 @@ export const LineToolsOptionDefaults = {
 	Callout: CalloutOptionDefaults,
 	Rectangle: RectangleOptionDefaults,
 	Circle: CircleOptionDefaults,
+	PriceRange: PriceRangeOptionDefaults,
 	Triangle: TriangleOptionDefaults,
 	Brush: BrushOptionDefaults,
 	Path: PathOptionDefaults,

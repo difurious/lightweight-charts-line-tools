@@ -13,6 +13,7 @@ import { LineToolHorizontalRay } from './line-tool-horizontal-ray';
 import { LineToolType } from './line-tool-options';
 import { LineToolParallelChannel } from './line-tool-parallel-channel';
 import { LineToolPath } from './line-tool-path';
+import { LineToolPriceRange } from './line-tool-price-range';
 import { LineToolRay } from './line-tool-ray';
 import { LineToolRectangle } from './line-tool-rectangle';
 import { LineToolText } from './line-tool-text';
@@ -32,6 +33,7 @@ export const LineTools: Record<LineToolType, new(...args: any) => LineTool<LineT
 	Callout: LineToolCallout,
 	Rectangle: LineToolRectangle,
 	Circle: LineToolCircle,
+	PriceRange: LineToolPriceRange,
 	Triangle: LineToolTriangle,
 	Brush: LineToolBrush,
 	Path: LineToolPath,

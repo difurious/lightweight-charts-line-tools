@@ -299,6 +299,23 @@ export interface CircleOptions {
 	extend: ExtendOptions;
 }
 
+export interface PriceRangeOptions {
+	/**
+	 * PriceRange background.
+	 */
+	background: Omit<BackroundOptions, 'inflation'>;
+
+	/**
+	 * PriceRange border.
+	*/
+	border: Omit<BorderOptions, 'radius' | 'highlight'>;
+
+	/**
+	 * PriceRange extend sides.
+	 */
+	extend: ExtendOptions;
+}
+
 export interface TriangleOptions {
 	/**
 	 * Triangle background.
@@ -534,6 +551,20 @@ export interface LineToolCircleOptions {
 }
 
 /**
+ * Represents style options for a price range.
+ */
+export interface LineToolPriceRangeOptions {
+	/**
+	 * Text config.
+	 */
+	text: TextOptions;
+	/**
+	 * PriceRange config.
+	 */
+	priceRange: PriceRangeOptions;
+}
+
+/**
  * Represents style options for a triangle.
  */
 export interface LineToolTriangleOptions {
@@ -652,6 +683,9 @@ export type RectangleToolPartialOptions = LineToolPartialOptions<LineToolRectang
 export type CircleToolOptions = LineToolOptions<LineToolCircleOptions>;
 export type CircleToolPartialOptions = LineToolPartialOptions<LineToolCircleOptions>;
 
+export type PriceRangeToolOptions = LineToolOptions<LineToolPriceRangeOptions>;
+export type PriceRangeToolPartialOptions = LineToolPartialOptions<LineToolPriceRangeOptions>;
+
 export type TriangleToolOptions = LineToolOptions<LineToolTriangleOptions>;
 export type TriangleToolPartialOptions = LineToolPartialOptions<LineToolTriangleOptions>;
 
@@ -675,6 +709,7 @@ export interface LineToolOptionsMap {
 	Callout: CalloutToolOptions;
 	Rectangle: RectangleToolOptions;
 	Circle: CircleToolOptions;
+	PriceRange: PriceRangeToolOptions;
 	Triangle: TriangleToolOptions;
 	Brush: BrushToolOptions;
 	Path: PathToolOptions;
@@ -700,6 +735,7 @@ export interface LineToolPartialOptionsMap {
 	Callout: CalloutToolPartialOptions;
 	Rectangle: RectangleToolPartialOptions;
 	Circle: CircleToolPartialOptions;
+	PriceRange: PriceRangeToolPartialOptions;
 	Triangle: TriangleToolPartialOptions;
 	Brush: BrushToolPartialOptions;
 	Path: PathToolPartialOptions;
