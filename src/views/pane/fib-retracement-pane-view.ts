@@ -5,8 +5,8 @@ import { ChartModel } from '../../model/chart-model';
 import { LineTool, LineToolOptionsInternal } from '../../model/line-tool';
 import { BoxHorizontalAlignment, BoxVerticalAlignment, FibRetracementLevel, LineToolType, TextAlignment } from '../../model/line-tool-options';
 import { CompositeRenderer } from '../../renderers/composite-renderer';
+import { RectangleRenderer } from '../../renderers/fib-retracement-renderer';
 import { AnchorPoint } from '../../renderers/line-anchor-renderer';
-import { RectangleRenderer } from '../../renderers/rectangle-renderer';
 import { SegmentRenderer } from '../../renderers/segment-renderer';
 import { TextRenderer } from '../../renderers/text-renderer';
 
