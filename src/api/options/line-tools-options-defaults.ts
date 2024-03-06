@@ -181,6 +181,10 @@ export const PriceRangeOptionDefaults: PriceRangeToolOptions = {
 		extend: { left: false, right: false },
 		background: { color: applyAlpha('#9c27b0', 0.2) },
 		border: { width: 1, style: LineStyle.Solid, color: '#9c27b0' },
+		showCenterHorizontalLine: true,
+		showCenterVerticalLine: true,
+		centerHorizontalLineWidth: 1,
+		centerHorizontalLineStyle: LineStyle.Dotted,
 	},
 	text: TextDefaults,
 };

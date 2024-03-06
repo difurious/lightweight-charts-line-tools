@@ -314,6 +314,22 @@ export interface PriceRangeOptions {
 	 * PriceRange extend sides.
 	 */
 	extend: ExtendOptions;
+	/**
+	 * PriceRange show the center horizontal line.
+	 */
+	showCenterHorizontalLine: boolean;
+	/**
+	 * PriceRange show the vertical line.
+	 */
+	showCenterVerticalLine: boolean;
+	/**
+	 * PriceRange center horizontal line width.
+	 */
+	centerHorizontalLineWidth: number;
+	/**
+	 * PriceRange center horizontal lineStyle.
+	 */
+	centerHorizontalLineStyle: LineStyle;
 }
 
 export interface TriangleOptions {

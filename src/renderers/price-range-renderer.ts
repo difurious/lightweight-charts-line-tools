@@ -98,33 +98,62 @@ export class PriceRangeRenderer implements IPaneRenderer {
 			ctx.lineTo(point1.x + (right ? adjustX : 0), point1.y + adjustX);
 	
 			// Draw the vertical line in the center
-			const centerX = (point0.x + point1.x) / 2;
-			ctx.moveTo(centerX, point0.y);
-			ctx.lineTo(centerX, point1.y);
+			if (this._data.showCenterVerticalLine) {
+				const centerX = (point0.x + point1.x) / 2;
+				ctx.moveTo(centerX, point0.y);
+				ctx.lineTo(centerX, point1.y);
 
-			// Calculate the initial y point for the arrow's tip
-			let arrowInitialY = 0;
+				// Calculate the initial y point for the arrow's tip
+				let arrowInitialY = 0;
 
-			// difference y between points
-			const yDiff = Math.abs(point0.y - point1.y);
-	
-			// arrow at top of box
-			if ((point0.y >= point1.y) && (yDiff > arrowSize)) {
-				arrowInitialY = point1.y + scaledBorderWidth;
-				// Draw the arrow
-				ctx.moveTo(centerX - arrowSize, arrowInitialY + arrowSize);
-				ctx.lineTo(centerX, arrowInitialY);
-				ctx.lineTo(centerX + arrowSize, arrowInitialY + arrowSize);
-			} else if ((point0.y < point1.y) && (yDiff > arrowSize)) {
-				// Arrow at bottom of box
-				arrowInitialY = point1.y - scaledBorderWidth;
-				// Draw the arrow
-				ctx.moveTo(centerX - arrowSize, arrowInitialY - arrowSize);
-				ctx.lineTo(centerX, arrowInitialY);
-				ctx.lineTo(centerX + arrowSize, arrowInitialY - arrowSize);
+				// difference y between points
+				const yDiff = Math.abs(point0.y - point1.y);
+		
+				// arrow at top of box
+				if ((point0.y >= point1.y) && (yDiff > arrowSize)) {
+					arrowInitialY = point1.y + scaledBorderWidth;
+					// Draw the arrow
+					ctx.moveTo(centerX - arrowSize, arrowInitialY + arrowSize);
+					ctx.lineTo(centerX, arrowInitialY);
+					ctx.lineTo(centerX + arrowSize, arrowInitialY + arrowSize);
+				} else if ((point0.y < point1.y) && (yDiff > arrowSize)) {
+					// Arrow at bottom of box
+					arrowInitialY = point1.y - scaledBorderWidth;
+					// Draw the arrow
+					ctx.moveTo(centerX - arrowSize, arrowInitialY - arrowSize);
+					ctx.lineTo(centerX, arrowInitialY);
+					ctx.lineTo(centerX + arrowSize, arrowInitialY - arrowSize);
+				}
 			}
 
 			ctx.stroke();
+		}
+
+		// draw he horizontal line in the price range
+		if (this._data.showCenterHorizontalLine) {
+			if (borderColor !== undefined && borderWidth > 0) {
+				// console.log(this._data);
+				// console.log('creating horizontal line in price range');
+				ctx.beginPath();
+				setLineStyle(ctx, this._data.centerHorizontalLineStyle as LineStyle);
+				
+				const scaledBorderWidthHorizontal = this._data.centerHorizontalLineWidth ? Math.max(1, Math.floor(this._data.centerHorizontalLineWidth * pixelRatio)) : 0;
+				ctx.lineWidth = scaledBorderWidthHorizontal;
+				ctx.strokeStyle = borderColor;
+
+				const adjustX = 0.5 * scaledBorderWidth;
+
+				const leftYCenter = (point0.y + point1.y) / 2;
+				const leftX = point0.x;
+				const rightYCenter = (point0.y + point1.y) / 2;
+				const rightX = point1.x;
+	
+				// Draw the horizontal center line
+				ctx.moveTo(leftX - (left ? adjustX : 0), leftYCenter);
+				ctx.lineTo(rightX + (right ? adjustX : 0), rightYCenter);
+
+				ctx.stroke();
+			}
 		}
 	
 		ctx.restore();
