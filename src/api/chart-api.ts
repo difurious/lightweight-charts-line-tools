@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/tslint/config */
 import { ChartWidget, LineToolsAfterEditEventParamsImpl, LineToolsAfterEditEventParamsImplSupplier, LineToolsDoubleClickEventParamsImpl, LineToolsDoubleClickEventParamsImplSupplier, MouseEventParamsImpl, MouseEventParamsImplSupplier } from '../gui/chart-widget';
 
 import { ensureDefined } from '../helpers/assertions';
@@ -450,6 +451,32 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 
 		return true;
 	}
+
+	public createOrUpdateLineTool<T extends LineToolType>(
+        lineToolType: T,
+        points: LineToolPoint[],
+        options: LineToolPartialOptionsMap[T],
+        id: string
+    ): void {
+		const pane = this._getPane();
+		if (pane === null) { return; }
+
+		// get the current pane's tool by id.
+        const existingLineTool = pane.getLineTool(id);
+		// id exists, so update that line tool id
+        if (existingLineTool !== null) {
+            // Update existing line tool, assuming applyOptions will recalulate the pane by iteslf
+            const lineToolApi = new LineToolApi(existingLineTool);
+            lineToolApi.setPoints(points);
+            lineToolApi.applyOptions(options);
+        } else {
+            // Create new line tool
+            const lineToolApi = this.addLineTool(lineToolType, points, options);
+            lineToolApi.lineTool.setId(id);
+        }
+		// Recalculate i dont think is needed, seems like it recalculates on it own
+        // pane.recalculate();
+    }
 
 	public applyNewData<TSeriesType extends SeriesType>(series: Series<TSeriesType>, data: SeriesDataItemTypeMap[TSeriesType][]): void {
 		this._sendUpdateToChart(this._dataLayer.setSeriesData(series, data));

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/tslint/config */
 /* eslint-disable @typescript-eslint/naming-convention */
 import { DeepPartial, OmitRecursively } from '../helpers/strict-type-checks';
 
@@ -332,6 +333,89 @@ export interface PriceRangeOptions {
 	centerHorizontalLineStyle: LineStyle;
 }
 
+export interface MarketDepthSingleAggregatesData {
+	EarliestTime: string;
+	LatestTime: string;
+	Side: string;
+	Price: string;
+	TotalSize: string;
+	BiggestSize: string;
+	SmallestSize: string;
+	NumParticipants: number;
+	TotalOrderCount: number;
+}
+
+export interface MarketDepthAggregatesData {
+    Bids: {
+        EarliestTime: string;
+        LatestTime: string;
+        Side: string;
+        Price: string;
+        TotalSize: string;
+        BiggestSize: string;
+        SmallestSize: string;
+        NumParticipants: number;
+        TotalOrderCount: number;
+    }[];
+    Asks: {
+        EarliestTime: string;
+        LatestTime: string;
+        Side: string;
+        Price: string;
+        TotalSize: string;
+        BiggestSize: string;
+        SmallestSize: string;
+        NumParticipants: number;
+        TotalOrderCount: number;
+    }[];
+}
+
+export interface MarketDepthOptions {
+	/**
+	 * MarketDepth line width.
+	 */
+	lineWidth: number;
+	/**
+	 * MarketDepth lineStyle.
+	 */
+	lineStyle: LineStyle;
+	/**
+	 * MarketDepth lineOffset pixels from the number before the line starts.
+	 */
+	lineOffset: number;
+	/**
+	 * MarketDepth lineLength max length the the line will be in pixels.
+	 */
+	lineLength: number;
+	/**
+	 * MarketDepth lineBidColor is the color of the line created for bid marketDepth data.
+	 */
+	lineBidColor: string;
+	/**
+	 * MarketDepth lineAskColor is the color of the line created for ask marketDepth data.
+	 */
+	lineAskColor: string;
+	/**
+	 * MarketDepth totalBidAskCalcMethod will calulate the highest totalSize in marketDepthData based off of bid and ask independently
+	 * or the highest totalSize taking into account both bid and ask combined. This number proportionately scales the lineLength.
+	 * "independent" will look at ask and find the highest totalSize just in ask entries and the calulation will use that for the ask entries.  likewise for bids
+	 * "combined" will look at ask and bid as if it was one thing and find the highest totalSize and both bid and ask will use that for the calculation for the line length
+	 * "independent" or "combined" (default)
+	 */
+	totalBidAskCalcMethod: string;
+	/**
+	 * MarketDepth timestampStartOffset is from timestamp, how far over until starting to draw.  Example
+	 * If a candle series is used, this number will be how far to the right from the timestamp in pixels the number will start drawing.
+	 * Then lineOffset applies to offset how far from he number the line start drawing, then the line draws a max of lineLength
+	 */
+	timestampStartOffset: number;
+	/**
+	 * MarketDepth MarketDepthAggregatesData will be the array of data used to loop and create the marketDepth levels.
+	 * see MarketDepthAggregatesData interface to see how the data should be formatted.  TotalSize is prety much the only data used.
+	 */
+	marketDepthData: MarketDepthAggregatesData;
+}
+
 export interface TriangleOptions {
 	/**
 	 * Triangle background.
@@ -581,6 +665,20 @@ export interface LineToolPriceRangeOptions {
 }
 
 /**
+ * Represents style options for market depth.
+ */
+export interface LineToolMarketDepthOptions {
+	/**
+	 * Text config.
+	 */
+	text: TextOptions;
+	/**
+	 * MarketDepth config.
+	 */
+	marketDepth: MarketDepthOptions;
+}
+
+/**
  * Represents style options for a triangle.
  */
 export interface LineToolTriangleOptions {
@@ -702,6 +800,9 @@ export type CircleToolPartialOptions = LineToolPartialOptions<LineToolCircleOpti
 export type PriceRangeToolOptions = LineToolOptions<LineToolPriceRangeOptions>;
 export type PriceRangeToolPartialOptions = LineToolPartialOptions<LineToolPriceRangeOptions>;
 
+export type MarketDepthToolOptions = LineToolOptions<LineToolMarketDepthOptions>;
+export type MarketDepthToolPartialOptions = LineToolPartialOptions<LineToolMarketDepthOptions>;
+
 export type TriangleToolOptions = LineToolOptions<LineToolTriangleOptions>;
 export type TriangleToolPartialOptions = LineToolPartialOptions<LineToolTriangleOptions>;
 
@@ -735,6 +836,8 @@ export interface LineToolOptionsMap {
 	Arrow: TrendLineToolOptions;
 	ExtendedLine: TrendLineToolOptions;
 	HorizontalRay: HorizontalLineToolOptions;
+
+	MarketDepth: MarketDepthToolOptions;
 }
 
 /**
@@ -761,6 +864,8 @@ export interface LineToolPartialOptionsMap {
 	Arrow: TrendLineToolPartialOptions;
 	ExtendedLine: TrendLineToolPartialOptions;
 	HorizontalRay: HorizontalLineToolPartialOptions;
+
+	MarketDepth: MarketDepthToolPartialOptions;
 }
 
 /**

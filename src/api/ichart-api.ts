@@ -210,6 +210,21 @@ export interface IChartApi {
 	applyLineToolOptions(newLineTool: LineToolExport<LineToolType>): boolean;
 
 	/**
+		 * Creates or updates a line tool with the specified ID.
+		 *
+		 * @param lineToolType - The type of line tool to create or update.
+		 * @param points - The points of the line tool.
+		 * @param options - The options for the line tool.
+		 * @param id - The ID of the line tool.
+	*/
+	createOrUpdateLineTool<T extends LineToolType>(
+		lineToolType: T,
+		points: LineToolPoint[],
+		options: LineToolPartialOptionsMap[T],
+		id: string
+	): void;
+
+	/**
 	 * Removes a series of any type. This is an irreversible operation, you cannot do anything with the series after removing it.
 	 *
 	 * @example

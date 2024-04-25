@@ -1,9 +1,10 @@
+/* eslint-disable @typescript-eslint/tslint/config */
 /* eslint-disable @typescript-eslint/naming-convention */
 import { applyAlpha } from '../../helpers/color';
 import { defaultFontFamily } from '../../helpers/make-font';
 import { clone, merge } from '../../helpers/strict-type-checks';
 
-import { BoxHorizontalAlignment, BoxVerticalAlignment, BrushToolOptions, CalloutToolOptions, CircleToolOptions, CrossLineToolOptions, FibRetracementToolOptions, HighlighterToolOptions, HorizontalLineToolOptions, LineJoin, ParallelChannelToolOptions, PathToolOptions, PriceRangeToolOptions, RectangleToolOptions, TextAlignment, TextOptions, TextToolOptions, TrendLineToolOptions, TriangleToolOptions, VerticalLineToolOptions } from '../../model/line-tool-options';
+import { BoxHorizontalAlignment, BoxVerticalAlignment, BrushToolOptions, CalloutToolOptions, CircleToolOptions, CrossLineToolOptions, FibRetracementToolOptions, HighlighterToolOptions, HorizontalLineToolOptions, LineJoin, MarketDepthToolOptions, ParallelChannelToolOptions, PathToolOptions, PriceRangeToolOptions, RectangleToolOptions, TextAlignment, TextOptions, TextToolOptions, TrendLineToolOptions, TriangleToolOptions, VerticalLineToolOptions } from '../../model/line-tool-options';
 
 import { LineEnd, LineStyle } from '../..';
 
@@ -189,6 +190,26 @@ export const PriceRangeOptionDefaults: PriceRangeToolOptions = {
 	text: TextDefaults,
 };
 
+export const MarketDepthOptionDefaults: MarketDepthToolOptions = {
+	visible: true,
+	editable: true,
+	marketDepth: {
+		lineWidth: 1,
+		lineStyle: LineStyle.Solid,
+		lineOffset: 30,
+		lineLength: 300,
+		lineBidColor: applyAlpha('#2a7a81', 1),
+		lineAskColor: applyAlpha('#d24949', 1),
+		timestampStartOffset: 50,
+		totalBidAskCalcMethod: 'combined',
+		marketDepthData: {
+            Bids: [],
+            Asks: [],
+        },
+	},
+	text: TextDefaults,
+};
+
 export const TriangleOptionDefaults: TriangleToolOptions = {
 	visible: true,
 	editable: true,
@@ -256,4 +277,5 @@ export const LineToolsOptionDefaults = {
 	Brush: BrushOptionDefaults,
 	Path: PathOptionDefaults,
 	Text: TextOptionDefaults,
+	MarketDepth: MarketDepthOptionDefaults,
 };

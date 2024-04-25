@@ -13,7 +13,7 @@ export class LineToolApi<TLineToolType extends LineToolType> implements ILineToo
 	}
 
 	public setPoints(points: LineToolPoint[]): void {
-		throw new Error('Method not implemented.');
+		this.lineTool.setPoints(points);
 	}
 
 	public applyOptions(options: LineToolPartialOptionsMap[TLineToolType]): void {

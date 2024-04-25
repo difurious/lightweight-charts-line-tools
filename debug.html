@@ -69,6 +69,7 @@ const displayTriangle = true;
 const displayBrush = true;
 const displayPath = true;
 const displayText = true;
+const displayMarketDepth = true;
 const displayRay = true;
 const displayArrow = true;
 const displayExtendedLine = true;
@@ -926,6 +927,133 @@ if (displayText) {
 		"visible": true,
 		"editable": true
 	});
+}
+
+// MarketDepth
+if (displayMarketDepth) {
+	const tePrice1 = 74.0;
+	const teTS1 = Date.parse('2019-04-19') / 1000; 
+	const tePoint1 = {price: tePrice1, timestamp: teTS1};
+
+	//const marketDepthTool = chart.addLineTool('MarketDepth', [tePoint1], {
+	const marketDepthTool = chart.createOrUpdateLineTool('MarketDepth', [tePoint1], {
+		"text": {
+			"value": "This Text Gets Overwritten By marketDepthData.?.TotalSize",
+			"alignment": "left", //center, left, right, currently this does not do anything.
+			"font": {
+				"color": "rgba(0,0,0,1)",
+				"size": 20,
+				"bold": false,
+				"italic": false,
+				"family": "Arial"
+			},
+			"box": {
+				"alignment": {
+					"vertical": "middle", //currently this does not do anything.
+					"horizontal": "center" //currently this does not do anything.
+				},
+				"angle": 0,
+				"scale": 1,
+				"offset": {
+					"x": 0,
+					"y": 0
+				},
+				"padding": {
+					"x": 0,
+					"y": 0
+				},
+				"maxHeight": 100,
+				"shadow": {
+					"blur": 10,
+					"color": "rgba(255,150,255,1)",
+					"offset": {
+						"x": 5,
+						"y": 5
+					}
+				},
+				"border": {
+					"color": "rgba(126,211,33,0.25)",
+					"width": 4,
+					"radius": 0,
+					"highlight": false,
+					"style": 0
+				},
+				"background": {
+					"color": "rgba(153,27,27,.25)",
+					"inflation": {
+						"x": 0,
+						"y": 0
+					}
+				}
+			},
+			"padding": 0,
+			"wordWrapWidth": 0,
+			"forceTextAlign": false,
+			"forceCalculateMaxLineWidth": false
+		},
+		"marketDepth": {
+                "lineWidth": 4,
+                "lineStyle": 0,
+                "lineOffset": 30,
+				"lineBidColor": 'rgb(42, 122, 129)',
+				"lineAskColor": 'rgb(210, 73, 73)',
+                "lineLength": 300,
+                "timestampStartOffset": 50,
+				"totalBidAskCalcMethod": 'combined',
+                "marketDepthData": {
+					"Bids": [
+						{
+							"EarliestTime": '2024-03-07T20:39:05Z',
+							"LatestTime": '2024-03-07T20:39:05Z',
+							"Side": 'Bid',
+							"Price": '72',
+							"TotalSize": '10',
+							"BiggestSize": '11',
+							"SmallestSize": '11',
+							"NumParticipants": 1,
+							"TotalOrderCount": 1,
+						},
+						{
+							"EarliestTime": '2024-03-07T20:39:03Z',
+							"LatestTime": '2024-03-07T20:39:03Z',
+							"Side": 'Bid',
+							"Price": '70',
+							"TotalSize": '40',
+							"BiggestSize": '12',
+							"SmallestSize": '12',
+							"NumParticipants": 1,
+							"TotalOrderCount": 1,
+						},
+					],
+					"Asks": [
+						{
+							"EarliestTime": '2024-03-07T20:39:05Z',
+							"LatestTime": '2024-03-07T20:39:05Z',
+							"Side": 'Ask',
+							"Price": '76',
+							"TotalSize": '20',
+							"BiggestSize": '5',
+							"SmallestSize": '5',
+							"NumParticipants": 1,
+							"TotalOrderCount": 1,
+						},
+						{
+							"EarliestTime": '2024-03-07T20:39:05Z',
+							"LatestTime": '2024-03-07T20:39:05Z',
+							"Side": 'Ask',
+							"Price": '78',
+							"TotalSize": '30',
+							"BiggestSize": '10',
+							"SmallestSize": '10',
+							"NumParticipants": 1,
+							"TotalOrderCount": 1,
+						},
+					],
+				},
+        },
+		"visible": true,
+		"editable": false
+	},'aLineToolThatIsAboutMarketDataID');
 }
 
 // Ray

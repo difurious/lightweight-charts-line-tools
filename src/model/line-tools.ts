@@ -10,6 +10,7 @@ import { LineToolFibRetracement } from './line-tool-fib-retracement';
 import { LineToolHighlighter } from './line-tool-highlighter';
 import { LineToolHorizontalLine } from './line-tool-horizontal-line';
 import { LineToolHorizontalRay } from './line-tool-horizontal-ray';
+import { LineToolMarketDepth } from './line-tool-market-depth';
 import { LineToolType } from './line-tool-options';
 import { LineToolParallelChannel } from './line-tool-parallel-channel';
 import { LineToolPath } from './line-tool-path';
@@ -43,4 +44,5 @@ export const LineTools: Record<LineToolType, new(...args: any) => LineTool<LineT
 	Arrow: LineToolArrow,
 	ExtendedLine: LineToolExtendedLine,
 	HorizontalRay: LineToolHorizontalRay,
+	MarketDepth: LineToolMarketDepth,
 };
