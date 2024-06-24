@@ -3,6 +3,7 @@ import { IPriceFormatter } from '../formatters/iprice-formatter';
 import { BarPrice } from '../model/bar';
 import { Coordinate } from '../model/coordinate';
 import { PriceLineOptions } from '../model/price-line-options';
+import { SeriesPlotRow } from '../model/series-data';
 import { SeriesMarker } from '../model/series-markers';
 import {
 	SeriesOptionsMap,
@@ -244,4 +245,13 @@ export interface ISeriesApi<TSeriesType extends SeriesType> {
 	 * ```
 	 */
 	seriesType(): TSeriesType;
+
+	/**
+	 * Retrieves the series data within a specified time range.
+	 *
+	 * @param range - The time range defining the start and end timestamps (or business days).
+	 * @returns An array of SeriesPlotRow objects within the range.
+	 */
+	getDataInRange(range: Range<Time>): SeriesPlotRow<TSeriesType>[];
+
 }

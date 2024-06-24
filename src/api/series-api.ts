@@ -9,6 +9,7 @@ import { PlotRowSearchMode } from '../model/plot-list';
 import { PriceLineOptions } from '../model/price-line-options';
 import { RangeImpl } from '../model/range-impl';
 import { Series, SeriesPartialOptionsInternal } from '../model/series';
+import { SeriesPlotRow } from '../model/series-data';
 import { SeriesMarker } from '../model/series-markers';
 import {
 	SeriesOptionsMap,
@@ -172,5 +173,43 @@ export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSe
 
 	public seriesType(): TSeriesType {
 		return this._series.seriesType();
+	}
+
+	public getDataInRange(range: Range<Time>): SeriesPlotRow<TSeriesType>[] {
+		// Access internal data
+		const bars = this._series.bars();
+		if (bars.isEmpty()) {
+			return []; // Return an empty array if no data is available
+		}
+
+		const timeScale = this._series.model().timeScale();
+
+		// Convert timestamps (or business days) to logical indices
+		const logicalFrom = timeScale.timeToIndex(convertTime(range.from), true);
+		const logicalTo = timeScale.timeToIndex(convertTime(range.to), true);
+
+		// Handle cases where indices are not found
+		if (logicalFrom === null || logicalTo === null) {
+			return [];
+		}
+
+		// Convert LogicalRange to strict range (casting to Logical)
+		const correctedRange = new TimeScaleVisibleRange(
+			new RangeImpl(logicalFrom as number as Logical, logicalTo as number as Logical)
+		).strictRange() as RangeImpl<TimePointIndex>;
+
+		// Find the first and last bars within the range
+		const dataFirstBarInRange = bars.search(correctedRange.left(), PlotRowSearchMode.NearestRight);
+		const dataLastBarInRange = bars.search(correctedRange.right(), PlotRowSearchMode.NearestLeft);
+
+		// Handle the case where no bars are found within the range
+		if (dataFirstBarInRange === null || dataLastBarInRange === null) {
+			return [];
+		}
+
+		// Extract bars within the range
+		const startIndex = dataFirstBarInRange.index;
+		const endIndex = dataLastBarInRange.index + 1; // endIndex is exclusive in slice
+		return bars.rows().slice(startIndex, endIndex);
 	}
 }
