@@ -225,6 +225,14 @@ export interface IChartApi {
 	): void;
 
 	/**
+	 * Retrieves a LineTool by its ID.
+	 *
+     * @param id - The ID of the line tool to retrieve.
+     * @returns A JSON string representation of the LineTool, or an empty array as a string if no line tool is found.
+     */
+	getLineToolByID(id: string): string;
+
+	/**
 	 * Removes a series of any type. This is an irreversible operation, you cannot do anything with the series after removing it.
 	 *
 	 * @example

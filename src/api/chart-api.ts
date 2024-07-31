@@ -445,6 +445,10 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 			return false;
 		}
 
+		if (lineTool.selected()) {
+			lineTool.setSelected(false);
+		}
+
 		lineTool.setPoints(newLineTool.points);
 		const lineToolApi = new LineToolApi(lineTool);
 		lineToolApi.applyOptions(newLineTool.options);
@@ -476,6 +480,26 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
         }
 		// Recalculate i dont think is needed, seems like it recalculates on it own
         // pane.recalculate();
+    }
+
+	/**
+	 * Retrieves a LineTool by its ID.
+	 *
+     * @param id - The ID of the line tool to retrieve.
+     * @returns A JSON string representation of the LineTool, or an empty array as a string if no line tool is found.
+     */
+    public getLineToolByID(id: string): string {
+        const pane = this._getPane();
+        if (pane === null) {
+            return JSON.stringify([]); // Return empty array if no pane is active
+        }
+
+        const lineTool = pane.getLineTool(id);
+        if (lineTool === null) {
+            return JSON.stringify([]); // Return empty array if line tool not found
+        }
+
+        return JSON.stringify([lineTool.exportLineToolToLineToolExport()]);
     }
 
 	public applyNewData<TSeriesType extends SeriesType>(series: Series<TSeriesType>, data: SeriesDataItemTypeMap[TSeriesType][]): void {
