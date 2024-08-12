@@ -1,3 +1,4 @@
+/* eslint-disable complexity */
 import { IInputEventListener, InputEventType, TouchMouseEvent } from '../../gui/mouse-event-handler';
 import { PaneWidget } from '../../gui/pane-widget';
 
@@ -9,9 +10,11 @@ import { ChartModel } from '../../model/chart-model';
 import { Coordinate } from '../../model/coordinate';
 import { HitTestResult, HitTestType } from '../../model/hit-test-result';
 import { LineTool, LineToolHitTestData, LineToolPoint } from '../../model/line-tool';
+import { LineToolLongShortPosition } from '../../model/line-tool-long-short-position';
 import { LineToolType } from '../../model/line-tool-options';
 import { PaneCursorType } from '../../model/pane';
 import { Point } from '../../model/point';
+import { UTCTimestamp } from '../../model/time-data';
 import { CompositeRenderer } from '../../renderers/composite-renderer';
 import { IPaneRenderer } from '../../renderers/ipane-renderer';
 import { AnchorPoint, LineAnchorRenderer } from '../../renderers/line-anchor-renderer';
@@ -34,13 +37,13 @@ export abstract class LineToolPaneView implements IUpdatablePaneView, IInputEven
 	protected _lineAnchorRenderers: LineAnchorRenderer[] = [];
 	protected _renderer: IPaneRenderer | null = null;
 	protected _onMouseDownInitialPoints: AnchorPoint[] = [];
+	private _isFlipped: boolean = false;
 
 	public constructor(source: LineTool<LineToolType>, model: ChartModel) {
 		this._source = source;
 		this._model = model;
 	}
 
-	// eslint-disable-next-line complexity
 	public onInputEvent(paneWidget: PaneWidget, ctx: CanvasRenderingContext2D, eventType: InputEventType, event?: TouchMouseEvent): void {
 		if (!event || (!this._renderer || !this._renderer.hitTest) && this._source.finished()) { return; }
 
@@ -145,9 +148,29 @@ export abstract class LineToolPaneView implements IUpdatablePaneView, IInputEven
 		}
 	}
 
+	public get isFlipped(): boolean {
+		return this._isFlipped;
+	}
+
+	// Public setter for _isFlipped
+	public setIsFlipped(isFlipped: boolean): void {
+		// Used to track if the LongShortPosition tool's direction
+		// (long/short) has been flipped during dragging.
+		this._isFlipped = isFlipped;
+	}
+
 	protected _onMouseUp(paneWidget: PaneWidget): boolean {
+		if (this._source.toolType() === 'LongShortPosition') {
+			// For LongShortPosition, reset the flipped state on mouse up,
+			// as we don't want to carry the flipped state between drags
+			this.setIsFlipped(false);
+		}
+
 		if (!this._source.finished()) {
-			this._source.tryFinish();
+			// donnt execute tryFinish on LongShortPosition because that is handled by addPoint
+			if (this._source.toolType() !== 'LongShortPosition') {
+				this._source.tryFinish();
+			}
 
 			const orderID = this._source.id();
 
@@ -173,10 +196,8 @@ export abstract class LineToolPaneView implements IUpdatablePaneView, IInputEven
 
 			// finished editing an existing line tool, fire after edit event
 			this.getSelectedAndFireAfterEdit(paneWidget, 'lineToolEdited', orderID);
-
 			return true;
 		}
-
 		return false;
 	}
 
@@ -204,8 +225,64 @@ export abstract class LineToolPaneView implements IUpdatablePaneView, IInputEven
 			if (this._editedPointIndex !== null) {
 				this._tryApplyLineToolShift(appliedPoint, event, true, originPoint);
 
-				this._source.setPoint(this._editedPointIndex, this._source.screenPointToPoint(appliedPoint) as LineToolPoint);
+				// LongShortPosition needs special handeling because it can flip to long to short and then enter the 3x PT constraint
+				if (this._source.toolType() === 'LongShortPosition') {
+					const longShortTool = this._source as LineToolLongShortPosition;
+					const priceScale = ensureNotNull(this._source.priceScale());
+					const timeScale = this._model.timeScale();
+					const firstValue = ensureNotNull(this._source.ownerSource()).firstValue();
+
+					// Create deep copies to prevent accidental modification of original values
+					const currentIsLong = JSON.parse(JSON.stringify(longShortTool.getIsLong()));
+					const appliedPointCopy = JSON.parse(JSON.stringify(appliedPoint));
+
+					if (firstValue !== null) {
+						// Check for a flip in long/short direction
+						if ((this._editedPointIndex === 0 || this._editedPointIndex === 1) && longShortTool.checkFlip(this._editedPointIndex, appliedPointCopy, currentIsLong)) {
+							// Update the _isLong state based on the flip
+							longShortTool.setIsLong(longShortTool.isCurrentLong());
+							this.setIsFlipped(true);
+
+							// Recalculate the PT point to reflect the flip
+							longShortTool.updatePT();
+						}
+
+						// Update point coordinates and the main source's point data
+						if (this._editedPointIndex === 0 || this._editedPointIndex === 1) {
+							const newTimestamp = timeScale.coordinateToTime(appliedPoint.x).timestamp;
+
+							// === Calculate draggedPrice ===
+							let draggedPrice = priceScale.coordinateToPrice(appliedPoint.y, firstValue.value);
+							draggedPrice = Number(priceScale.formatPrice(draggedPrice, firstValue.value)) as BarPrice;
+
+							// Update the source point
+							this._source.setPoint(this._editedPointIndex, { price: draggedPrice, timestamp: newTimestamp });
+
+							// === Calculate draggedX and draggedY ===
+							const draggedX = timeScale.timeToCoordinate({ timestamp: newTimestamp });
+							const draggedY = priceScale.priceToCoordinate(draggedPrice, firstValue.value);
+
+							this._points[this._editedPointIndex].x = draggedX;
+							this._points[this._editedPointIndex].y = draggedY;
+						} else if (this._editedPointIndex === 2) { // PT Point
+							let newPtPrice = priceScale.coordinateToPrice(appliedPoint.y, firstValue.value);
+
+							newPtPrice = Number(priceScale.formatPrice(newPtPrice, firstValue.value)) as BarPrice;
+
+							// Update the PT point in the main source
+							this._source.setPoint(this._editedPointIndex, { price: newPtPrice, timestamp: this._source.points()[1].timestamp });
+						}
+
+						// Update PT point coordinates to stay in sync
+						this._points[2].x = timeScale.timeToCoordinate({ timestamp: this._source.points()[2].timestamp as UTCTimestamp });
+						this._points[2].y = priceScale.priceToCoordinate(this._source.points()[2].price, firstValue.value);
+					}
+				} else {
+					// For other tools, update the point normally
+					this._source.setPoint(this._editedPointIndex, this._source.screenPointToPoint(appliedPoint) as LineToolPoint);
+				}
 			} else if (this._lastMovePoint) {
+				// ... (Logic for moving the entire tool) ...
 				const diff = appliedPoint.subtract(this._lastMovePoint);
 				this._points.forEach((point: Point) => {
 					point.x = (point.x + diff.x) as Coordinate;
@@ -220,16 +297,50 @@ export abstract class LineToolPaneView implements IUpdatablePaneView, IInputEven
 	}
 
 	protected _onMouseMove(paneWidget: PaneWidget, ctx: CanvasRenderingContext2D, originPoint: Point, appliedPoint: Point, event: TouchMouseEvent): boolean {
+		// Tool is in preview (creation) mode
 		if (!this._source.finished()) {
-			if (this._source.hasMagnet()) { this._model.magnet().enable(); }
+			// special hendeling of LongShortPosition
+			if (this._source.toolType() === 'LongShortPosition') {
+				const longShortTool = this._source as LineToolLongShortPosition;
 
-			this._tryApplyLineToolShift(appliedPoint, event, false, originPoint);
+				// Only update preview if one point has been placed (clickCount === 1)
+				if (!this._source.finished() && longShortTool.getClickCount() === 1) {
+					if (this._source.hasMagnet()) {
+						this._model.magnet().enable();
+					}
 
-			this._source.setLastPoint(this._source.screenPointToPoint(appliedPoint) as LineToolPoint);
+					// Get the PriceScale and firstValue
+					const priceScale = ensureNotNull(this._source.priceScale());
+					const firstValue = priceScale.firstValue();
+
+					// Apply shift constraints (if applicable) BEFORE rounding
+					this._tryApplyLineToolShift(appliedPoint, event, false, originPoint);
+
+					// Calculate the temporary Stop Loss point
+					const tempStopLossPoint = this._source.screenPointToPoint(appliedPoint) as LineToolPoint;
+
+					// Round the price using formatPrice, ONLY if firstValue is not null
+					if (firstValue !== null) {
+						tempStopLossPoint.price = Number(priceScale.formatPrice(tempStopLossPoint.price, firstValue));
+					}
+
+					// Update the preview points for the LongShortPosition tool
+					(this._source as LineToolLongShortPosition).updatePreviewPoints(tempStopLossPoint);
+				}
+			} else {
+				// Handle preview for other line tool types
+				if (this._source.hasMagnet()) { this._model.magnet().enable(); }
+
+				this._tryApplyLineToolShift(appliedPoint, event, false, originPoint);
+
+				this._source.setLastPoint(this._source.screenPointToPoint(appliedPoint) as LineToolPoint);
+			}
 		} else {
+			// Tool is finished (creation complete), handle hovering
 			const hitResult = this._hitTest(paneWidget, ctx, originPoint);
 			const changed = this._source.setHovered(hitResult !== null && !event.consumed);
 
+			// Set cursor based on hover and editability
 			if (this._source.hovered() && !event.consumed) {
 				if (this._source.options().editable === true) {
 					paneWidget.setCursor(hitResult?.data()?.cursorType || PaneCursorType.Pointer);
@@ -241,7 +352,6 @@ export abstract class LineToolPaneView implements IUpdatablePaneView, IInputEven
 
 			return changed;
 		}
-
 		return false;
 	}
 
@@ -249,19 +359,59 @@ export abstract class LineToolPaneView implements IUpdatablePaneView, IInputEven
 		// lock in points location on mouseDown to use with shift event for fib and rectangle
 		this._onMouseDownInitialPoints = this._points;
 
-		if (!this._source.finished()) {
-			this._tryApplyLineToolShift(appliedPoint, event, false, originPoint);
-
-			this._source.addPoint(this._source.screenPointToPoint(appliedPoint) as LineToolPoint);
-			return false;
-		} else {
-			if (this._source.options().editable === true) {
-				const hitResult = this._hitTest(paneWidget, ctx, originPoint);
-				return this._source.setSelected(hitResult !== null && !event.consumed);
-			} else {
-				return false;
+		// Initialize _isLong for restored tools
+		// when position tools already exist, i need to change setIsLong so the tool does not start
+        // modifying in the equivelent of isFlipped logic at 3x movement.  with this, it will just adjust
+        // the entry and stop like normal
+		// click count was set by constructor
+		if (this._source.toolType() === 'LongShortPosition') {
+			const longShortTool = this._source as LineToolLongShortPosition;
+			if (this._source.points().length === 3 && longShortTool.getClickCount() === 2) {
+				const priceScale = ensureNotNull(this._source.priceScale());
+				const firstValue = ensureNotNull(priceScale.firstValue());
+				const entryPrice = Number(priceScale.formatPrice(this._source.points()[0].price, firstValue));
+				const stopLossPrice = Number(priceScale.formatPrice(this._source.points()[1].price, firstValue));
+				longShortTool.setIsLong(entryPrice > stopLossPrice);
 			}
 		}
+
+		if (!this._source.finished()) {
+			// ===  Handle new points (preview/creation mode) ===
+
+			// LongShortPosition specific handling
+			if (this._source.toolType() === 'LongShortPosition') {
+				// Reset _isFlipped for LongShortPosition tools
+				this.setIsFlipped(false);
+				const longShortTool = this._source as LineToolLongShortPosition;
+
+				// increment click count and add point
+				if (!this._source.finished() && longShortTool.getClickCount() < 2) {
+					longShortTool.setClickCount(longShortTool.getClickCount() + 1);
+					// Call addPoint() HERE for LongShortPosition
+					this._source.addPoint(this._source.screenPointToPoint(appliedPoint) as LineToolPoint);
+				}
+			} else {
+				// Handling for other line tool types
+				this._tryApplyLineToolShift(appliedPoint, event, false, originPoint);
+
+				this._source.addPoint(this._source.screenPointToPoint(appliedPoint) as LineToolPoint);
+			}
+			return false;
+		}
+		// Handle finished and editable tools:
+		if (this._source.options().editable === true) {
+			const hitResult = this._hitTest(paneWidget, ctx, originPoint);
+
+			// Deselect if clicked on background:
+			if (hitResult === null) {
+				this._source.setSelected(false);
+				return true;
+			} else {
+				// Handle selection of the tool:
+				return this._source.setSelected(hitResult !== null && !event.consumed);
+			}
+		}
+		return false;
 	}
 
 	protected _updateSourcePoints(): void {
@@ -286,11 +436,54 @@ export abstract class LineToolPaneView implements IUpdatablePaneView, IInputEven
 
 		this._points = [] as AnchorPoint[];
 		const sourcePoints = this._source.points();
-		for (let i = 0; i < sourcePoints.length; i++) {
-			const point = this._source.pointToScreenPoint(sourcePoints[i]) as AnchorPoint;
-			if (!point) { return; }
-			point.data = i;
-			this._points.push(point);
+		const priceScale = ensureNotNull(this._source.priceScale());
+		const timeScale = this._model.timeScale();
+		const firstValue = ensureNotNull(this._source.ownerSource()).firstValue();
+
+		// Special Handling for LongShortPosition Tool
+		if (this._source.toolType() === 'LongShortPosition') {
+			const longShortTool = this._source as LineToolLongShortPosition;
+
+			// Calculate Entry and Stop Loss anchor coordinates
+			// directly from their prices (for accuracy)
+			for (let i = 0; i < 2; i++) {
+				const point = sourcePoints[i];
+
+				if (point !== undefined) {
+					const ptX = timeScale.timeToCoordinate({ timestamp: point.timestamp as UTCTimestamp });
+					let ptY = NaN as Coordinate;
+					if (firstValue !== null) {
+						ptY = priceScale.priceToCoordinate(point.price, firstValue.value);
+					}
+
+					this._points.push(new AnchorPoint(ptX, ptY, i, false));
+				}
+			}
+
+			// Only proceed if there are enough points for the PT point
+			// If the tool is finalized, calculate the PT anchor
+			if (sourcePoints.length >= 3) {
+				// 1. Calculate rounded PT price and timestamp
+				const ptPoint = longShortTool.calculateThirdPoint(longShortTool.points()[2]);
+
+				// 2. Calculate rounded x and y coordinates for PT:
+				const ptX = timeScale.timeToCoordinate({ timestamp: ptPoint.timestamp as UTCTimestamp });
+				let ptY = NaN as Coordinate;
+				if (firstValue !== null) {
+					ptY = priceScale.priceToCoordinate(ptPoint.price, firstValue.value);
+				}
+
+				// 3. Create AnchorPoint for PT point:
+				this._points.push(new AnchorPoint(ptX, ptY, 2, false));
+			}
+		} else {
+			// Handle all other tools using the loop and pointToScreenPoint:
+			for (let i = 0; i < sourcePoints.length; i++) {
+				const point = this._source.pointToScreenPoint(sourcePoints[i]) as AnchorPoint;
+				if (!point) { return; }
+				point.data = i;
+				this._points.push(point);
+			}
 		}
 	}
 
@@ -308,9 +501,6 @@ export abstract class LineToolPaneView implements IUpdatablePaneView, IInputEven
 		const isTrendLine = this._isTrendLine();
 		const toolTypeStr = String(this._source.toolType());
 
-		// console.log('editing point index number');
-		// console.log(this._editedPointIndex);
-
 		// if shift, isTrendLine = true and at least 1 point exists already
 		if (event.shiftKey === true && isTrendLine === true && this._points.length > 0) {
 			// override point
@@ -320,12 +510,12 @@ export abstract class LineToolPaneView implements IUpdatablePaneView, IInputEven
 				} else if (this._editedPointIndex === 0) {
 					appliedPoint.y = this._points[1].y;
 				} else if (this._editedPointIndex === 2) {
-					// parallelChannel is the only tool supporting holding shift that has 3-4 points
+					// parallelChannel is the only tool supporting holding shift that has 4 points
 					// points does not track point 3, so i have to use the diference from 0 and 1 and offset 2 so it now match what point 3 is without knowing anything about 3
 					const dif = this._points[0].y - this._points[1].y;
 					appliedPoint.y = (this._points[2].y - dif) as Coordinate;
 				} else if (this._editedPointIndex === 3) {
-					// parallelChannel is the only tool supporting holding shift that has 3-4 points
+					// parallelChannel is the only tool supporting holding shift that has 4 points, position tool has 3, but PT anchor does not need shift treatment
 					appliedPoint.y = this._points[2].y;
 				}
 			} else {
@@ -339,6 +529,14 @@ export abstract class LineToolPaneView implements IUpdatablePaneView, IInputEven
 
 		if (toolTypeStr === 'FibRetracement' && event.shiftKey === true && this._points.length === 2 && this._editedPointIndex !== null && this._onMouseDownInitialPoints.length === 2) {
 			appliedPoint.y = this._onMouseDownInitialPoints[this._editedPointIndex].y;
+		}
+
+		if (toolTypeStr === 'LongShortPosition' && event.shiftKey === true && this._points.length >= 2 && this._editedPointIndex !== null && this._onMouseDownInitialPoints.length >= 2) {
+			if (this._editedPointIndex === 0) {
+				appliedPoint.y = this._onMouseDownInitialPoints[0].y;
+			} else if (this._editedPointIndex === 1) {
+				appliedPoint.y = this._onMouseDownInitialPoints[1].y;
+			}
 		}
 
 		if (toolTypeStr === 'Rectangle' && event.shiftKey === true && this._points.length === 2 && this._editedPointIndex !== null && this._onMouseDownInitialPoints.length === 2) {
@@ -361,7 +559,7 @@ export abstract class LineToolPaneView implements IUpdatablePaneView, IInputEven
 			} else if (this._editedPointIndex === 1 || this._editedPointIndex === 2) {
 				appliedPoint.y = this._onMouseDownInitialPoints[1].y;
 			}
-		}		
+		}
 	}
 
 	protected _isTrendLine(): boolean {

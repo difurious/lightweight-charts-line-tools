@@ -283,6 +283,33 @@ export interface RectangleOptions {
 	extend: ExtendOptions;
 }
 
+export interface LongShortPositionOptions {
+    /**
+     * Rectangle config for the Entry to Stop Loss area.
+     */
+    entryStopLossRectangle: RectangleOptions;
+
+    /**
+     * Text config for the Entry to Stop Loss area.
+     */
+    entryStopLossText: TextOptions;
+
+    /**
+     * Rectangle config for the Entry to Profit Target area.
+     */
+    entryPtRectangle: RectangleOptions;
+
+    /**
+     * Text config for the Entry to Profit Target area.
+     */
+    entryPtText: TextOptions;
+
+	/**
+     * Info about stop and pt will be displayed as text automatically
+     */
+	showAutoText: boolean;
+}
+
 export interface CircleOptions {
 	/**
 	 * Circle background.
@@ -794,6 +821,9 @@ export type HorizontalLineToolPartialOptions = LineToolPartialOptions<LineToolHo
 export type RectangleToolOptions = LineToolOptions<LineToolRectangleOptions>;
 export type RectangleToolPartialOptions = LineToolPartialOptions<LineToolRectangleOptions>;
 
+export type LongShortPositionToolOptions = LineToolOptions<LongShortPositionOptions>;
+export type LongShortPositionToolPartialOptions = LineToolPartialOptions<LongShortPositionOptions>;
+
 export type CircleToolOptions = LineToolOptions<LineToolCircleOptions>;
 export type CircleToolPartialOptions = LineToolPartialOptions<LineToolCircleOptions>;
 
@@ -825,6 +855,7 @@ export interface LineToolOptionsMap {
 	TrendLine: TrendLineToolOptions;
 	Callout: CalloutToolOptions;
 	Rectangle: RectangleToolOptions;
+	LongShortPosition: LongShortPositionToolOptions;
 	Circle: CircleToolOptions;
 	PriceRange: PriceRangeToolOptions;
 	Triangle: TriangleToolOptions;
@@ -853,6 +884,7 @@ export interface LineToolPartialOptionsMap {
 	TrendLine: TrendLineToolPartialOptions;
 	Callout: CalloutToolPartialOptions;
 	Rectangle: RectangleToolPartialOptions;
+	LongShortPosition: LongShortPositionToolPartialOptions;
 	Circle: CircleToolPartialOptions;
 	PriceRange: PriceRangeToolPartialOptions;
 	Triangle: TriangleToolPartialOptions;

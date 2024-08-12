@@ -4,7 +4,7 @@ import { applyAlpha } from '../../helpers/color';
 import { defaultFontFamily } from '../../helpers/make-font';
 import { clone, merge } from '../../helpers/strict-type-checks';
 
-import { BoxHorizontalAlignment, BoxVerticalAlignment, BrushToolOptions, CalloutToolOptions, CircleToolOptions, CrossLineToolOptions, FibRetracementToolOptions, HighlighterToolOptions, HorizontalLineToolOptions, LineJoin, MarketDepthToolOptions, ParallelChannelToolOptions, PathToolOptions, PriceRangeToolOptions, RectangleToolOptions, TextAlignment, TextOptions, TextToolOptions, TrendLineToolOptions, TriangleToolOptions, VerticalLineToolOptions } from '../../model/line-tool-options';
+import { BoxHorizontalAlignment, BoxVerticalAlignment, BrushToolOptions, CalloutToolOptions, CircleToolOptions, CrossLineToolOptions, FibRetracementToolOptions, HighlighterToolOptions, HorizontalLineToolOptions, LineJoin, LongShortPositionToolOptions, MarketDepthToolOptions, ParallelChannelToolOptions, PathToolOptions, PriceRangeToolOptions, RectangleToolOptions, TextAlignment, TextOptions, TextToolOptions, TrendLineToolOptions, TriangleToolOptions, VerticalLineToolOptions } from '../../model/line-tool-options';
 
 import { LineEnd, LineStyle } from '../..';
 
@@ -164,6 +164,24 @@ export const RectangleOptionDefaults: RectangleToolOptions = {
 	text: TextDefaults,
 };
 
+export const LongShortPositionOptionDefaults: LongShortPositionToolOptions = {
+	visible: true,
+	editable: true,
+	showAutoText: true,
+    entryStopLossRectangle: {
+        background: { color: applyAlpha('red', 0.2) },
+        border: { width: 1, style: LineStyle.Solid, color: 'red' },
+        extend: { left: false, right: false },
+    },
+    entryPtRectangle: {
+        background: { color: applyAlpha('green', 0.2) },
+        border: { width: 1, style: LineStyle.Solid, color: 'green' },
+        extend: { left: false, right: false },
+    },
+    entryStopLossText: clone(TextDefaults),
+	entryPtText: clone(TextDefaults),
+};
+
 export const CircleOptionDefaults: CircleToolOptions = {
 	visible: true,
 	editable: true,
@@ -271,6 +289,7 @@ export const LineToolsOptionDefaults = {
 	TrendLine: TrendLineOptionDefaults,
 	Callout: CalloutOptionDefaults,
 	Rectangle: RectangleOptionDefaults,
+	LongShortPosition: LongShortPositionOptionDefaults,
 	Circle: CircleOptionDefaults,
 	PriceRange: PriceRangeOptionDefaults,
 	Triangle: TriangleOptionDefaults,

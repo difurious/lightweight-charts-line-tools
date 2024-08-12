@@ -307,10 +307,11 @@ export abstract class LineTool<T extends LineToolType = LineToolType> extends Pr
 		return true;
 	}
 
-	// implementation of IPriceDataSource
+	// used in LongShortPosition to conform to minMove of price scale
 	public minMove(): number {
-		return 0;
-		// return this._options.priceFormat.minMove;
+		// Use a default value if _ownerSource is null
+		return this._ownerSource ? this._ownerSource.minMove() : 0.01;
+		// return 0;
 	}
 
 	public autoscaleInfo(startTimePoint: TimePointIndex, endTimePoint: TimePointIndex): AutoscaleInfoImpl | null {
