@@ -502,6 +502,79 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
         return JSON.stringify([lineTool.exportLineToolToLineToolExport()]);
     }
 
+	/**
+	* Retrieves multiple LineTools whose IDs match a given regular expression.
+	*
+	* @param regex - The regular expression to match against LineTool IDs.
+	* @returns A JSON string representing an array of matching LineTools
+	* (in the `LineToolExport` format), or an empty array as a
+	* string if no matching line tools are found.
+	*/
+	public getLineToolsByIdRegex(regex: RegExp): string {
+		// Validate input
+		if (!(regex instanceof RegExp)) {
+			return JSON.stringify([]); // Return an empty array for invalid input
+		}
+
+		// Get the active pane from the chart
+		const pane = this._getPane();
+
+		// Handle the case where there's no active pane
+		if (pane === null) {
+			return JSON.stringify([]); // Return an empty JSON array
+		}
+
+		// Get all LineTools from the active pane
+		const allLineTools = pane.getAllLineTools();
+		const exportedTools = []; // Array to store exported tools
+
+		// Manually loop through line tools
+		for (const tool of allLineTools) {
+			// GOTCHA without resetting the index to 0, it will have eratic behavior matching results.
+			// if you do not have the g (global) flag it would work fine, but the user should not have to know to use the g flag or not
+			// I will just handle it here and they can use the g flag.
+			regex.lastIndex = 0;
+			if (regex.test(tool.id())) {
+				exportedTools.push(tool.exportLineToolToLineToolExport());
+			}
+		}
+
+		// Convert the array of exported tools to a JSON string and return it
+		return JSON.stringify(exportedTools);
+	}
+
+	/**
+	 * Removes LineTools whose IDs match a given regular expression.
+	 *
+	 * @param regex - The regular expression to match against LineTool IDs.
+	 */
+	public removeLineToolsByIdRegex(regex: RegExp): void {
+		if (!(regex instanceof RegExp)) {
+			return; // Do nothing if invalid input
+		}
+
+		const pane = this._getPane();
+		if (pane === null) {
+			return; // No active pane
+		}
+
+		const allLineTools = pane.getAllLineTools();
+
+		// Manually loop through line tools
+		for (const tool of allLineTools) {
+			// GOTCHA without resetting the index to 0, it will have eratic behavior matching results.
+			// if you do not have the g (global) flag it would work fine, but the user should not have to know to use the g flag or not
+			// I will just handle it here and they can use the g flag.
+			regex.lastIndex = 0;
+			if (regex.test(tool.id())) { // Check for a match
+				pane.removeDataSource(tool); // Remove if it matches
+			}
+		}
+
+		// Recalculate the pane after removal
+		pane.recalculate();
+	}
+
 	public applyNewData<TSeriesType extends SeriesType>(series: Series<TSeriesType>, data: SeriesDataItemTypeMap[TSeriesType][]): void {
 		this._sendUpdateToChart(this._dataLayer.setSeriesData(series, data));
 	}

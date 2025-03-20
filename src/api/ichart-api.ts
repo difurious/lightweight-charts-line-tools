@@ -233,6 +233,23 @@ export interface IChartApi {
 	getLineToolByID(id: string): string;
 
 	/**
+    * Retrieves multiple LineTools whose IDs match a given regular expression.
+    *
+    * @param regex - The regular expression to match against LineTool IDs.
+    * @returns A JSON string representing an array of matching LineTools
+    * (in the `LineToolExport` format), or an empty array as a
+    * string if no matching line tools are found, or if 'regex' is not a valid regular expression object.
+    */
+	getLineToolsByIdRegex(regex: RegExp): string;
+
+   /**
+    * Removes LineTools whose IDs match a given regular expression.
+    *
+    * @param regex - The regular expression to match against LineTool IDs.
+    */
+	removeLineToolsByIdRegex(regex: RegExp): void;
+
+	/**
 	 * Removes a series of any type. This is an irreversible operation, you cannot do anything with the series after removing it.
 	 *
 	 * @example

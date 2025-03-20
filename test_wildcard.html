@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Lightweight Chart Regex LineTool Test</title>
+  <script src="Z:/learning/crypto/tradestation_bot/tradestation_api_bot/GIT/ligtweight_lineTools_community_3_8_merge/test/lineTools_20_wildcard_id_search/dist/lightweight-charts.standalone.development.js"></script>
+  <style>
+    body {
+      margin: 0;
+    }
+
+    .container {
+      width: 800px;
+      height: 400px;
+      margin: 20px auto;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div id="chart"></div>
+  <div class="buttons-container">
+    <button id="TrendLineButton">Add TrendLine</button> <button id="HorizontalLineButton">Add HorizontalLine</button>
+    <button id="FibRetracementButton">Add FibRetracement</button>
+    <button id="RectangleButton">Add Rectangle</button>
+    <button id="VerticalLineButton">Add VerticalLine</button>
+    <button id="RayButton">Add Ray</button>
+    <button id="ArrowButton">Add Arrow</button>
+    <button id="ExtendedLineButton">Add ExtendedLine</button>
+    <button id="HorizontalRayButton">Add HorizontalRay</button>
+    <button id="CircleButton">Add Circle</button>
+    <button id="PriceRangeButton">Add PriceRange</button>
+    <button id="TriangleButton">Add Triangle</button>
+    <button id="BrushButton">Add Brush</button>
+    <button id="PathButton">Add Path</button>
+    <button id="TextButton">Add Text</button>
+  </div>
+  <button id="getButton">Get Matching Line Tools</button>
+  <button id="removeButton">Remove Matching Line Tools</button>
+  <button id="getAllButton">Get All Line Tools</button>
+  <div id="output"></div>
+</div>
+
+<script>
+  const chart = LightweightCharts.createChart(document.getElementById('chart'), {
+    width: 800,
+    height: 400,
+    rightPriceScale: {
+      scaleMargins: {
+        top: 0.3,
+        bottom: 0.25,
+      },
+    },
+    timeScale: {
+      timeVisible: true, 
+      secondsVisible: false,
+    },
+  });
+
+  const candlestickSeries = chart.addCandlestickSeries();
+
+  // Sample candlestick data (at least 10 candles)
+  candlestickSeries.setData([
+    { time: '2023-04-25', open: 100, high: 110, low: 95, close: 105 },
+    { time: '2023-04-26', open: 105, high: 115, low: 102, close: 110 },
+    { time: '2023-04-27', open: 110, high: 120, low: 105, close: 118 },
+    { time: '2023-04-28', open: 118, high: 125, low: 112, close: 122 },
+    { time: '2023-04-29', open: 122, high: 128, low: 115, close: 120 },
+    { time: '2023-05-01', open: 120, high: 130, low: 118, close: 126 },
+    { time: '2023-05-02', open: 126, high: 135, low: 122, close: 132 },
+    { time: '2023-05-03', open: 132, high: 140, low: 128, close: 135 },
+    { time: '2023-05-04', open: 135, high: 145, low: 130, close: 142 },
+    { time: '2023-05-05', open: 142, high: 150, low: 138, close: 145 },
+    { time: '2023-05-08', open: 145, high: 155, low: 140, close: 152 },
+    { time: '2023-05-09', open: 152, high: 160, low: 148, close: 156 },
+    { time: '2023-05-10', open: 156, high: 165, low: 153, close: 162 },
+    { time: '2023-05-11', open: 162, high: 170, low: 158, close: 165 },
+    { time: '2023-05-12', open: 165, high: 175, low: 160, close: 172 },
+    { time: '2023-05-15', open: 172, high: 180, low: 168, close: 178 },
+    { time: '2023-05-16', open: 178, high: 185, low: 175, close: 182 },
+    { time: '2023-05-17', open: 182, high: 190, low: 178, close: 186 },
+    { time: '2023-05-18', open: 186, high: 195, low: 182, close: 190 },
+    { time: '2023-05-19', open: 190, high: 200, low: 185, close: 195 }
+  ]);
+
+  // Create 5 LineTools (4 matching, 1 non-matching)
+  chart.createOrUpdateLineTool('TrendLine', 
+    [{ time: '2023-04-28', price: 107 }, { time: '2023-05-03', price: 137 }], 
+    { line: { color: 'blue' } },
+    'my_special_trendline_1'); 
+
+  chart.createOrUpdateLineTool('HorizontalLine', 
+    [{ time: '2023-05-02', price: 110 }],
+    { line: { color: 'green' } },
+    'my_special_trendline_2');
+	
+  chart.createOrUpdateLineTool('HorizontalLine', 
+    [{ time: '2023-05-02', price: 115 }],
+    { line: { color: 'green' } },
+    'my_special_trendline_6');
+
+  chart.createOrUpdateLineTool('FibRetracement', 
+    [{ time: '2023-04-27', price: 95 }, { time: '2023-05-08', price: 155 }], 
+    { line: { color: 'red' } },
+    'my_special_trendline_3');
+
+  chart.createOrUpdateLineTool('Rectangle', 
+    [{ time: '2023-04-29', price: 115 }, { time: '2023-05-01', price: 128 }],
+    { line: { color: 'orange' } },
+    'my_special_trendline_4');
+
+  chart.createOrUpdateLineTool('VerticalLine', 
+    [{ time: '2023-05-02', price: 110 }], 
+    { line: { color: 'purple' } },
+    'other_line_tool'); 
+
+  // Regex to match the 4 line tools 
+  const regex = /my_special_trendline.*/;
+  
+  // Set the visible range:
+  chart.timeScale().setVisibleRange({
+    from: '2023-04-25', 
+    to: '2023-05-19'   
+  });
+  
+  // Add LineTool Button Click Handlers
+  // Add LineTool Button Click Handlers (corrected IDs)
+  const lineToolTypes = [
+    'TrendLine', 'HorizontalLine', 'FibRetracement', 'Rectangle', 'VerticalLine', 
+    'Ray', 'Arrow', 'ExtendedLine', 'HorizontalRay', 'Circle', 'PriceRange',
+    'Triangle', 'Brush', 'Path', 'Text' 
+  ];
+
+  lineToolTypes.forEach(type => {
+    document.getElementById(type + 'Button').addEventListener('click', () => {
+      chart.addLineTool(type, [], {}); 
+    });
+  });
+
+  // Get Button Click Handler
+  document.getElementById('getButton').addEventListener('click', () => {
+    const matchingToolsJson = chart.getLineToolsByIdRegex(regex);
+    console.log(JSON.parse(matchingToolsJson))
+  });
+
+  // Remove Button Click Handler
+  document.getElementById('removeButton').addEventListener('click', () => {
+    chart.removeLineToolsByIdRegex(regex);
+  });
+  
+  // Get All Button Click Handler
+  document.getElementById('getAllButton').addEventListener('click', () => {
+    const allLineToolsJson = chart.exportLineTools();
+    console.log("All Line Tools:", JSON.parse(allLineToolsJson));
+  });
+  
+
+</script>
+
+</body>
+</html>
