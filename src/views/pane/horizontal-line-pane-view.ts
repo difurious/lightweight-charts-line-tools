@@ -26,6 +26,12 @@ export class HorizontalLinePaneView extends LineToolPaneView {
 
 	// eslint-disable-next-line complexity
 	protected override _updateImpl(height: number, width: number): void {
+		const options = this._source.options() as LineToolOptionsInternal<'HorizontalLine'>;
+
+		if (!options.visible) {
+			return;
+		}
+
 		this._renderer = null;
 
 		const priceScale = this._source.priceScale();
@@ -35,12 +41,25 @@ export class HorizontalLinePaneView extends LineToolPaneView {
 		const points = this._source.points();
 		if (points.length < 1) { return; }
 
-		const startTime = timeScale.coordinateToTime(0 as Coordinate);
-		const endTime = timeScale.coordinateToTime(width as Coordinate);
-		const options = this._source.options() as LineToolOptionsInternal<'HorizontalLine'>;
+		const point0Data = points[0];
+
+		const ownerSource = this._source.ownerSource();
+		const firstValue = ownerSource?.firstValue();
+		if (!firstValue) { return; }
+
+		const point0ScreenY = priceScale.priceToCoordinate(point0Data.price, firstValue.value);
+		const y0 = point0ScreenY;
+
+		const pane = this._model.paneForSource(this._source);
+		const paneHeight = pane?.height() ?? 0;
+
+		// Consolidated vertical top and bottom off-screen check
+		const isOffScreenTopVertical = (y0 < 0);
+		const isOffScreenBottomVertical = (y0 > paneHeight);
+		const isOffScreenVertical = isOffScreenTopVertical || isOffScreenBottomVertical;
 
 		const { left, right } = options.line.extend || {};
-		const isOutsideView = (!left && points[0].timestamp > endTime.timestamp) || (!right && points[0].timestamp < startTime.timestamp);
+		const isOutsideView = isOffScreenVertical;
 
 		if (!isOutsideView) {
 			super._updateImpl();

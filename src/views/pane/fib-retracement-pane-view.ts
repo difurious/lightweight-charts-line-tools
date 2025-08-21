@@ -24,6 +24,12 @@ export class FibRetracementPaneView extends LineToolPaneView {
 
 	// eslint-disable-next-line complexity
 	protected override _updateImpl(): void {
+		const options = this._source.options() as LineToolOptionsInternal<'FibRetracement'>;
+
+		if (!options.visible) {
+			return;
+		}
+
 		this._renderer = null;
 		this._invalidated = false;
 
@@ -31,13 +37,18 @@ export class FibRetracementPaneView extends LineToolPaneView {
 		const timeScale = this._model.timeScale();
 
 		if (!priceScale || priceScale.isEmpty() || timeScale.isEmpty()) { return; }
-		const strictRange = timeScale.visibleTimeRange();
-		if (strictRange === null) { return; }
+		const visibleTimestampRange = timeScale.timestampRangeFromVisibleLogicalRange();
+		if (visibleTimestampRange === null) { return; }
 		const points = this._source.points();
 		if (points.length < 2) { return; }
 
-		const options = this._source.options() as LineToolOptionsInternal<'FibRetracement'>;
-		const isOutsideView = Math.max(points[0].timestamp, points[1].timestamp) < strictRange.from.timestamp;
+		// I am not checking for offscreen vertical, only horizontal, because the fib is intended to extend into price discovery
+        // Consolidated horizontal right and left off-screen check
+		const isOffScreenRightHorizontal = Math.min(points[0].timestamp, points[1].timestamp) > Number(visibleTimestampRange.to);
+		const isOffScreenLeftHorizontal = Math.max(points[0].timestamp, points[1].timestamp) < Number(visibleTimestampRange.from);
+		const isOffScreenHorizontal = isOffScreenRightHorizontal || isOffScreenLeftHorizontal;
+
+		const isOutsideView = isOffScreenHorizontal;
 
 		if (!isOutsideView || options.extend.left || options.extend.right) {
 			super._updateImpl();

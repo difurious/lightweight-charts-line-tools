@@ -67,9 +67,21 @@ export abstract class LineToolPaneView implements IUpdatablePaneView, IInputEven
 		}
 	}
 
+	/*
 	public renderer(height: number, width: number, addAnchors?: boolean | undefined): IPaneRenderer | null {
 		if (this._invalidated) { this._updateImpl(height, width); }
 		return this._source.visible() ? this._renderer : null;
+	}
+	*/
+
+	public renderer(height: number, width: number, addAnchors?: boolean | undefined): IPaneRenderer | null {
+		if (!this._source.options().visible) {
+			return null;
+		}
+		if (this._invalidated) {
+			this._updateImpl(height, width); // _updateImpl() is now only called if visible
+		}
+		return this._renderer;
 	}
 
 	public priceToCoordinate(price: BarPrice): Coordinate | null {

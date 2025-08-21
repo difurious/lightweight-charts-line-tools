@@ -6,23 +6,17 @@ import { DeepPartial } from '../helpers/strict-type-checks';
 
 import { Coordinate } from '../model/coordinate';
 import { HitTestResult, HitTestType } from '../model/hit-test-result';
-// import { distanceToSegment, pointInBox } from '../model/interesection';
+
 import { CircleOptions } from '../model/line-tool-options';
 import { Point } from '../model/point';
 
 import { LineStyle } from '..';
-// import { calculateDistance } from './draw-rect';
+
 import { IPaneRenderer } from './ipane-renderer';
 import { AnchorPoint } from './line-anchor-renderer';
 import { setLineStyle } from './draw-line';
 
 export type CircleRendererData = DeepPartial<CircleOptions> & { points: AnchorPoint[]; hitTestBackground?: boolean };
-
-// GOTCHA - BUG  since there are 2 points to make the circle, if point1 to is to the left of the center point (point0) and then
-// you pan the screen so point1 and point0 are off screen, it will hide the circle eventhough you see the circle further to the right.
-// If point1 is to the right of point0 and then you pan, things will will act normal
-// this glitch might be what causes drawing a rectangle off screen when no data is to the left and you start drawing in that blank area,
-// and the rectangle does not show initially.
 
 export class CircleRenderer implements IPaneRenderer {
     protected _backHitTest: HitTestResult<void>;
@@ -80,12 +74,16 @@ export class CircleRenderer implements IPaneRenderer {
         const scaledBorderWidth = this._calculateScaledBorderWidth(pixelRatio);
     
         const [point0, point1] = this._data.points;
-        // const extend = this._data.extend || {};
-        // const left = extend.left || false; // Provide a default value
-        // const right = extend.right || false; // Provide a default value
     
         const [centerX, centerY] = this._calculateCirclePositionAndDimensions(point0);
-    
+
+        const radius = this._calculateCircleRadius(point0, point1);    
+        
+        if (!this._isCircleVisible(ctx, centerX, centerY, radius)) {
+            // console.log('dont draw circle');
+            return;
+        }
+
         const background = this._data.background;
         const borderColor = this._data.border?.color;
     
@@ -133,6 +131,24 @@ export class CircleRenderer implements IPaneRenderer {
             ctx.strokeStyle = borderColor;
             ctx.stroke();
         }
+    }
+
+    private _isCircleVisible(ctx: CanvasRenderingContext2D, centerX: number, centerY: number, radius: number): boolean {
+        const canvasWidth = ctx.canvas.width;
+        const canvasHeight = ctx.canvas.height;
+    
+        // Check if any part of the circle's bounding box is within the canvas
+        const circleLeft = centerX - radius;
+        const circleRight = centerX + radius;
+        const circleTop = centerY - radius;
+        const circleBottom = centerY + radius;
+    
+        return (
+            circleRight >= 0 &&                      // Circle's right edge is at or beyond the left canvas edge
+            circleLeft <= canvasWidth &&            // Circle's left edge is at or before the right canvas edge
+            circleBottom >= 0 &&                     // Circle's bottom edge is at or beyond the top canvas edge
+            circleTop <= canvasHeight                 // Circle's top edge is at or before the bottom canvas edge
+        );
     }
 }
 

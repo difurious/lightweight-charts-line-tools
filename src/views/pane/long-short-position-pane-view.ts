@@ -48,6 +48,12 @@ export class LongShortPositionPaneView extends LineToolPaneView {
     }
 
     protected override _updateImpl(): void {
+        const options = this._source.options() as LineToolOptionsInternal<'LongShortPosition'>;
+
+        if (!options.visible) {
+			return;
+		}
+
         this._renderer = null;
         this._invalidated = false;
 
@@ -55,95 +61,134 @@ export class LongShortPositionPaneView extends LineToolPaneView {
         const timeScale = this._model.timeScale();
 
         if (!priceScale || priceScale.isEmpty() || timeScale.isEmpty()) { return; }
-        const strictRange = timeScale.visibleTimeRange();
-        if (strictRange === null) { return; }
+        const visibleTimestampRange = timeScale.timestampRangeFromVisibleLogicalRange();
+        if (visibleTimestampRange === null) { return; }
 
-        // Ensure _points is updated even if the tool is not finalized
-        super._updateImpl();
+        const points = this._source.points();
+        const point0Data = points[0];
+		const point1Data = points[1];
+        const point2Data = points[2];
 
-        if (this._points.length === 0) { return; } // No points to work with
+		if (!point0Data || !point1Data || !point2Data) {
+			return;
+		}
 
-        const options = this._source.options() as LineToolOptionsInternal<'LongShortPosition'>;
-        const compositeRenderer = new CompositeRenderer();
+		const ownerSource = this._source.ownerSource();
+		const firstValue = ownerSource?.firstValue();
+		if (!firstValue) { return; }
 
-        // Prepare points for rectangle renderers
-        const entryStopLossPoints = [this._points[0], this._points[1]];
-        const ptPoints = [this._points[0], this._points[2]];
+		const point0ScreenY = priceScale.priceToCoordinate(point0Data.price, firstValue.value);
+		const point1ScreenY = priceScale.priceToCoordinate(point1Data.price, firstValue.value);
+        const point2ScreenY = priceScale.priceToCoordinate(point2Data.price, firstValue.value);
 
-        // Entry to Stop Loss Rectangle
-        this._entryStopLossRenderer.setData({
-            points: entryStopLossPoints,
-            background: options.entryStopLossRectangle.background,
-            border: options.entryStopLossRectangle.border,
-            extend: options.entryStopLossRectangle.extend,
-            hitTestBackground: false,
-        });
+		const y0 = point0ScreenY;
+		const y1 = point1ScreenY;
+        const y2 = point2ScreenY;
 
-            // Entry to PT Rectangle
-        this._ptRenderer.setData({
-            points: ptPoints,
-            background: options.entryPtRectangle.background,
-            border: options.entryPtRectangle.border,
-            extend: options.entryPtRectangle.extend,
-            hitTestBackground: false,
-        });
+		const pane = this._model.paneForSource(this._source);
+		const paneHeight = pane?.height() ?? 0;
+		// const paneWidth = pane?.width() ?? 0;
 
-        compositeRenderer.append(this._entryStopLossRenderer);
-        compositeRenderer.append(this._ptRenderer);
+        // Consolidated vertical top and bottom off-screen check
+		const isOffScreenTopVertical = (y0 < 0 && y1 < 0 && y2 < 0);
+		const isOffScreenBottomVertical = (y0 > paneHeight && y1 > paneHeight && y2 > paneHeight);
+		const isOffScreenVertical = isOffScreenTopVertical || isOffScreenBottomVertical;
 
-        // Get the text data
-        const entryStopLossText = this._getText(options.entryStopLossText, entryStopLossPoints, false);
+		// Consolidated horizontal right and left off-screen check
+		const isOffScreenRightHorizontal = Math.min(points[0].timestamp, points[1].timestamp, points[2].timestamp) > Number(visibleTimestampRange.to);
+		const isOffScreenLeftHorizontal = Math.max(points[0].timestamp, points[1].timestamp, points[2].timestamp) < Number(visibleTimestampRange.from);
+		const isOffScreenHorizontal = isOffScreenRightHorizontal || isOffScreenLeftHorizontal;
 
-        // Entry to Stop Loss Text
-        if (options.entryStopLossText.value || entryStopLossText.text.value !== '') {
-            this._entryStopLossLabelRenderer.setData({
-                text: entryStopLossText.text,
-                points: [entryStopLossText.point],
+		const isOutsideView = isOffScreenVertical || isOffScreenHorizontal;
+
+        if (!isOutsideView || options.entryStopLossRectangle.extend.left || options.entryStopLossRectangle.extend.right || options.entryPtRectangle.extend.left || options.entryPtRectangle.extend.right) {
+            // console.log('draw position tool');
+            // Ensure _points is updated even if the tool is not finalized
+            super._updateImpl();
+
+            if (this._points.length === 0) { return; } // No points to work with
+
+            const compositeRenderer = new CompositeRenderer();
+
+            // Prepare points for rectangle renderers
+            const entryStopLossPoints = [this._points[0], this._points[1]];
+            const ptPoints = [this._points[0], this._points[2]];
+
+            // Entry to Stop Loss Rectangle
+            this._entryStopLossRenderer.setData({
+                points: entryStopLossPoints,
+                background: options.entryStopLossRectangle.background,
+                border: options.entryStopLossRectangle.border,
+                extend: options.entryStopLossRectangle.extend,
+                hitTestBackground: false,
             });
-            compositeRenderer.append(this._entryStopLossLabelRenderer);
-        }
 
-        // Get the text data
-        const entryPtText = this._getText(options.entryPtText, ptPoints, true);
-
-        // Entry to PT Text
-        if (options.entryPtText.value || entryPtText.text.value !== '') {
-            this._ptLabelRenderer.setData({
-                text: entryPtText.text,
-                points: [entryPtText.point],
+                // Entry to PT Rectangle
+            this._ptRenderer.setData({
+                points: ptPoints,
+                background: options.entryPtRectangle.background,
+                border: options.entryPtRectangle.border,
+                extend: options.entryPtRectangle.extend,
+                hitTestBackground: false,
             });
-            compositeRenderer.append(this._ptLabelRenderer);
-        }
 
-        // PT Constraint and Anchor Update Logic
-        if (this._source.points().length >= 3) {
-            const minPriceMove = Number(this._source.minMove());
-            let ptPrice = this._source.points()[2].price;
-            const entryPrice = this._source.points()[0].price;
+            compositeRenderer.append(this._entryStopLossRenderer);
+            compositeRenderer.append(this._ptRenderer);
 
-            // Adjust PT price based on long/short direction
-            if ((this._source as LineToolLongShortPosition).isCurrentLong()) {
-                ptPrice = Math.max(ptPrice, entryPrice + minPriceMove); // Ensure PT above Entry for longs
-            } else {
-                ptPrice = Math.min(ptPrice, entryPrice - minPriceMove); // Ensure PT below Entry for shorts
+            // Get the text data
+            const entryStopLossText = this._getText(options.entryStopLossText, entryStopLossPoints, false);
+
+            // Entry to Stop Loss Text
+            if (options.entryStopLossText.value || entryStopLossText.text.value !== '') {
+                this._entryStopLossLabelRenderer.setData({
+                    text: entryStopLossText.text,
+                    points: [entryStopLossText.point],
+                });
+                compositeRenderer.append(this._entryStopLossLabelRenderer);
             }
 
-            // Update the PT point in the source
-            this._source.setPoint(2, { price: ptPrice, timestamp: this._source.points()[2].timestamp });
+            // Get the text data
+            const entryPtText = this._getText(options.entryPtText, ptPoints, true);
 
-            const firstValue = ensureNotNull(this._source.ownerSource()).firstValue();
-            if (firstValue !== null) {
-                // Update the PT anchor point's coordinates
-                const ptX = timeScale.timeToCoordinate({ timestamp: this._source.points()[2].timestamp as UTCTimestamp });
-                const ptY = priceScale.priceToCoordinate(ptPrice, ensureNotNull(firstValue.value));
-
-                this._points[2].x = ptX;
-                this._points[2].y = ptY;
+            // Entry to PT Text
+            if (options.entryPtText.value || entryPtText.text.value !== '') {
+                this._ptLabelRenderer.setData({
+                    text: entryPtText.text,
+                    points: [entryPtText.point],
+                });
+                compositeRenderer.append(this._ptLabelRenderer);
             }
-        }
 
-        this._addAnchors(compositeRenderer);
-        this._renderer = compositeRenderer;
+            // PT Constraint and Anchor Update Logic
+            if (this._source.points().length >= 3) {
+                const minPriceMove = Number(this._source.minMove());
+                let ptPrice = this._source.points()[2].price;
+                const entryPrice = this._source.points()[0].price;
+
+                // Adjust PT price based on long/short direction
+                if ((this._source as LineToolLongShortPosition).isCurrentLong()) {
+                    ptPrice = Math.max(ptPrice, entryPrice + minPriceMove); // Ensure PT above Entry for longs
+                } else {
+                    ptPrice = Math.min(ptPrice, entryPrice - minPriceMove); // Ensure PT below Entry for shorts
+                }
+
+                // Update the PT point in the source
+                this._source.setPoint(2, { price: ptPrice, timestamp: this._source.points()[2].timestamp });
+
+                // const firstValue = ensureNotNull(this._source.ownerSource()).firstValue();
+                if (firstValue !== null) {
+                    // Update the PT anchor point's coordinates
+                    const ptX = timeScale.timeToCoordinate({ timestamp: this._source.points()[2].timestamp as UTCTimestamp });
+                    const ptY = priceScale.priceToCoordinate(ptPrice, ensureNotNull(firstValue.value));
+
+                    this._points[2].x = ptX;
+                    this._points[2].y = ptY;
+                }
+            }
+
+            this._addAnchors(compositeRenderer);
+            this._renderer = compositeRenderer;
+        }
     }
 
     protected _addAnchors(renderer: CompositeRenderer): void {

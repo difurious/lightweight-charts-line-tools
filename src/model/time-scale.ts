@@ -1,3 +1,5 @@
+import { TimeRange } from '../api/itime-scale-api';
+
 import { DateFormatter } from '../formatters/date-formatter';
 import { DateTimeFormatter } from '../formatters/date-time-formatter';
 
@@ -294,7 +296,7 @@ export class TimeScale {
 		const interval = this._points[1].time.timestamp - this._points[0].time.timestamp;
 
 		if (index >= this._points.length - 1) {
-			return { timestamp: (lastTime + interval * (index - this._points.length + 1 )) as UTCTimestamp };
+			return { timestamp: (lastTime + interval * (index - this._points.length + 1)) as UTCTimestamp };
 		} else if (index < 0) {
 			return { timestamp: (firstTime - interval * -index) as UTCTimestamp };
 		} else if (time1 && time2) {
@@ -456,7 +458,6 @@ export class TimeScale {
 		} else {
 			return x;
 		}
-		
 	}
 
 	public coordinateToIndex(x: Coordinate): TimePointIndex {
@@ -476,6 +477,62 @@ export class TimeScale {
 		}
 
 		return this._points[index].time;
+	}
+
+    /**
+     * Converts a logical index to local x coordinate.
+     *
+     * @param logical - Logical index needs to be converted
+     * @returns x coordinate of that time or `null` if the chart doesn't have data
+     */
+	public logicalToCoordinate(logical: Logical): Coordinate | null {
+		if (this.isEmpty()) {
+			return null;
+		} else {
+			return this.indexToCoordinate(logical as unknown as TimePointIndex); // Reuses existing indexToCoordinate
+		}
+	}
+
+    /**
+     * Converts a coordinate to logical index.
+     *
+     * @param x - Coordinate needs to be converted
+     * @returns Logical index that is located on that coordinate or `null` if the chart doesn't have data
+     */
+	public coordinateToLogical(x: number): Logical | null {
+		if (this.isEmpty()) {
+			return null;
+		} else {
+			return this.coordinateToIndex(x as Coordinate) as unknown as Logical;
+		}
+	}
+
+	/**
+	 * Gets the visible time range in timestamps, extended to include the right offset (blank space).
+	 *
+	 * @returns An object with 'from' and 'to' timestamps representing the extended visible time range, or null if there is no data.
+	 */
+	public timestampRangeFromVisibleLogicalRange(): TimeRange | null { // MODIFIED - No argument needed
+		const logicalRangeImpl = this.visibleLogicalRange(); // Fetch logicalRange internally
+
+		if (logicalRangeImpl === null) {
+			return null;
+		}
+
+		const leftLogical = logicalRangeImpl.left();
+		const rightLogical = logicalRangeImpl.right();
+
+		// Convert the *extended* logical range (including right offset) to screen coordinates, then back to time
+		const visibleStartCoordinate = this.logicalToCoordinate(Math.floor(leftLogical) as Logical);
+		const visibleEndCoordinate = this.logicalToCoordinate(Math.ceil(rightLogical) as Logical);
+
+		const visibleStartTime = this.coordinateToTime(visibleStartCoordinate as Coordinate);
+		const visibleEndTime = this.coordinateToTime(visibleEndCoordinate as Coordinate);
+
+		return {
+			from: visibleStartTime.timestamp,
+			to: visibleEndTime.timestamp,
+		};
 	}
 
 	public setRightOffset(offset: number): void {
