@@ -532,6 +532,44 @@ export interface FibRetracementLevel {
 	distanceFromCoeff: number;
 }
 
+/**
+ * This represents a single bracket order within the Fib Retracement trade strategy.
+ */
+
+export interface FibBracketOrder {
+	uniqueId: string | null;
+    conditionLevelCoeff: number | null;
+    conditionLevelPrice: number;
+    entryLevelCoeff: number | null;
+    entryLevelPrice: number;
+    stopMethod: 'fib' | 'price' | 'points'; // Use a union type for known string values
+    stopLevelCoeff: number | null; // Can be null if not using 'fib' method
+    stopPriceInput: number | null; // Can be null if not using 'price' method
+    stopPointsInput: number | null; // Can be null if not using 'points' method
+    finalStopPrice: number;
+    ptMethod: 'fib' | 'price' | 'points'; // Use a union type for known string values
+    ptLevelCoeff: number | null; // Can be null if not using 'fib' method
+    ptPriceInput: number | null; // Can be null if not using 'price' method
+    ptPointsInput: number | null; // Can be null if not using 'points' method
+    finalPtPrice: number;
+	isMoveStopToEnabled: boolean;
+	moveStopToMethod: 'fib' | 'price' | 'points';
+	moveStopToLevelCoeff: number | null;
+	moveStopToPriceInput: number | null;
+	moveStopToPointsInput: number | null;
+	finalMoveStopToPrice: number;
+	triggerBracketUniqueId: string | null;
+}
+
+/**
+ * Represents fib blank trade strategy object to fill it with anything user wants.
+ */
+export interface FibRetracementTradeStrategy {
+    enabled: boolean;
+    longOrShort: 'long' | 'short' | 'neutral' | ''; // Added '' for the "N/A" or initial state
+    fibBracketOrders: FibBracketOrder[]; // Array of the FibBracketOrder interface
+}
+
 export interface LineToolOptionsCommon {
 	/**
 	 * Visibility of the line.
@@ -778,6 +816,12 @@ export interface LineToolFibRetracementOptions {
 	 * Fib Levels.
 	 */
 	levels: FibRetracementLevel[];
+
+	/**
+	 * Fib tradeStrategy, left blank to just be a place data can be stored
+	 */
+	tradeStrategy: FibRetracementTradeStrategy;
+
 }
 
 /**

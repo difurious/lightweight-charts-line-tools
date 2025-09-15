@@ -139,6 +139,36 @@ export const FibRetracementOptionDefaults: FibRetracementToolOptions = {
         { color: '#9c27b0', coeff: 3.618, opacity: 0, distanceFromCoeffEnabled: false, distanceFromCoeff: 0 },
         { color: '#e91e63', coeff: 4.236, opacity: 0, distanceFromCoeffEnabled: false, distanceFromCoeff: 0 },
 	],
+	tradeStrategy: {
+		enabled: false,
+		longOrShort: '',
+		fibBracketOrders: [
+			{
+				uniqueId: null,
+				conditionLevelCoeff: null,
+				conditionLevelPrice: 0,
+				entryLevelCoeff: null,
+				entryLevelPrice: 0,
+				stopMethod: 'fib',
+				stopLevelCoeff: null,
+				stopPriceInput: null,
+				stopPointsInput: null,
+				finalStopPrice: 0,
+				ptMethod: 'fib',
+				ptLevelCoeff: null,
+				ptPriceInput: null,
+				ptPointsInput: null,
+				finalPtPrice: 0,
+				isMoveStopToEnabled: false,
+				moveStopToMethod: 'fib',
+				moveStopToLevelCoeff: null,
+				moveStopToPriceInput: null,
+				moveStopToPointsInput: null,
+				finalMoveStopToPrice: 0,
+				triggerBracketUniqueId: null,
+			},
+		],
+	},
 };
 
 export const BrushOptionDefaults: BrushToolOptions = {
