@@ -76,6 +76,7 @@ const displayExtendedLine = true;
 const displayHorizontalRay = true;
 const displayFibonnaciRetracement = true;
 const displayParallelChannel = true;
+const displayLongShortPosition = true;
 
 // HorizontalLine
 if (displayHorizontalLine) {
@@ -1569,6 +1570,100 @@ if (displayParallelChannel) {
 		"visible": true,
 		"editable": true
 	});
+}
+
+// LongShortPosition
+if (displayLongShortPosition) {
+	const pcPrice1 = 90.0;
+	const pcTS1 = Date.parse('2019-05-23') / 1000; 
+	const pcPoint1 = {price: pcPrice1, timestamp: pcTS1};
+	const pcPrice2 = 85.0;
+	const pcTS2 = Date.parse('2019-05-28') / 1000; 
+	const pcPoint2 = {price: pcPrice2, timestamp: pcTS2};
+	const pcPrice3 = 102.0;
+	const pcTS3 = Date.parse('2019-05-28') / 1000; 
+	const pcPoint3 = {price: pcPrice3, timestamp: pcTS3};
+
+	const LongShortPositionTool = chart.addLineTool('LongShortPosition', [pcPoint1, pcPoint2, pcPoint3], {
+		"visible": true,
+		"editable": true,
+		"showAutoText": true,
+		"entryStopLossRectangle": {
+			"background": {
+				"color": "rgba(255, 0, 0, 0.2)"
+			},
+			"border": {
+				"width": 1,
+				"style": 0,
+				"color": "red"
+			},
+			"extend": {
+				"left": false,
+				"right": false
+			}
+		},
+		"entryPtRectangle": {
+			"background": {
+				"color": "rgba(0, 128, 0, 0.2)"
+			},
+			"border": {
+				"width": 1,
+				"style": 0,
+				"color": "green"
+			},
+			"extend": {
+				"left": false,
+				"right": false
+			}
+		},
+		"entryStopLossText": {
+			"value": "",
+			"padding": 0,
+			"wordWrapWidth": 0,
+			"forceTextAlign": false,
+			"forceCalculateMaxLineWidth": false,
+			"alignment": "left",
+			"font": {
+				"family": "'Trebuchet MS', Roboto, Ubuntu, sans-serif",
+				"color": "#2962ff",
+				"size": 12,
+				"bold": false,
+				"italic": false
+			},
+			"box": {
+				"scale": 1,
+				"angle": 0,
+				"alignment": {
+					"vertical": "top",
+					"horizontal": "left"
+				}
+			}
+		},
+		"entryPtText": {
+			"value": "",
+			"padding": 0,
+			"wordWrapWidth": 0,
+			"forceTextAlign": false,
+			"forceCalculateMaxLineWidth": false,
+			"alignment": "left",
+			"font": {
+				"family": "'Trebuchet MS', Roboto, Ubuntu, sans-serif",
+				"color": "#2962ff",
+				"size": 12,
+				"bold": false,
+				"italic": false
+			},
+			"box": {
+				"scale": 1,
+				"angle": 0,
+				"alignment": {
+					"vertical": "top",
+					"horizontal": "left"
+				}
+			}
+		}
+	});
+
 }
 
 //manually place a linetool without points specified "[]".  You could also not define options and it will use defaults and still let you place it
