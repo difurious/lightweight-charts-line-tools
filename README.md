@@ -1,5 +1,19 @@
 <!-- markdownlint-disable no-inline-html first-line-h1 -->
 
+# ⚠️ PROJECT MOVED / DEPRECATED ⚠️
+
+### The Line Tools project has moved to a new repository supporting Lightweight Charts V5!
+
+## 👉 [CLICK HERE FOR THE NEW LIGHTWEIGHT CHARTS LINE TOOLS CORE](https://github.com/difurious/lightweight-charts-line-tools-core) 👈
+
+**Please Note:**
+*   The new project is a **Plugin for Lightweight Charts V5** (it is no longer a modified source build of v3.8).
+*   It is designed as a **drop-in replacement** for the functionality found in this repository.
+*   Please read the full `README` of the new Core project to learn how to install and use it.
+
+---
+---
+
 <div align="center">
   <a href="https://www.tradingview.com/lightweight-charts/" target="_blank">
     <img width="200" src="https://github.com/tradingview/lightweight-charts/raw/master/.github/logo.svg?sanitize=true">
